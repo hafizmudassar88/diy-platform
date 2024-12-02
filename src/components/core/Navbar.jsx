@@ -68,6 +68,11 @@ function Navbar() {
               <Link href={"/"}>Home</Link>
             </li>
             <li>
+              <Link href={"/templete"} className="me-1 w-full">
+                Templates
+              </Link>
+            </li>
+            <li>
               <Link href={"/about-us"}>About Us</Link>
             </li>
             <li>
