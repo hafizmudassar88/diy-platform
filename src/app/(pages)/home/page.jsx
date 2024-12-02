@@ -77,7 +77,7 @@ function Home() {
       </div>
 
       <AboutUs showHeroSection={false} />
-      <Services showHeroSection={false} limit={3} />
+      <Services />
 
       <div className="bg-white pb-10">
         <div className="bg-white flex flex-col justify-center items-center text-black p-10">
