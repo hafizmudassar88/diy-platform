@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useUser } from "../../contexts/UserContext";
 
 const servicesMenu = [
   { title: "Customizable Templates", url: "/customizable-template" },
@@ -16,6 +17,7 @@ function Navbar() {
   const [isServicesOpen, setServicesOpen] = useState(false);
   const dropdownRef = useRef(null);
   const servicesButtonRef = useRef(null);
+  const { isAuthenticated } = useUser();
 
   useEffect(() => {
     // Function to handle clicks outside the dropdown
@@ -67,11 +69,13 @@ function Navbar() {
             <li>
               <Link href={"/"}>Home</Link>
             </li>
-            <li>
-              <Link href={"/templete"} className="me-1 w-full">
-                Templates
-              </Link>
-            </li>
+            {isAuthenticated && (
+              <li>
+                <Link href={"/templete"} className="me-1 w-full">
+                  Templates
+                </Link>
+              </li>
+            )}
             <li>
               <Link href={"/about-us"}>About Us</Link>
             </li>
@@ -149,11 +153,13 @@ function Navbar() {
             </Link>
           </li>
 
-          <li className="m-1">
-            <Link href={"/templete"} className="me-1 w-full">
-              Templates
-            </Link>
-          </li>
+          {isAuthenticated && (
+            <li className="m-1">
+              <Link href={"/templete"} className="me-1 w-full">
+                Templates
+              </Link>
+            </li>
+          )}
 
           <li className="m-1 relative group">
             <Link href={"/services"} className="w-full">

@@ -3,6 +3,7 @@ import "./globals.css";
 import StoreProvider from "../redux/store/StoreProvider";
 import Navbar from "../components/core/Navbar";
 import Footer from "../components/core/Footer"; // Fixed Footer import path
+import AppProvider from "../contexts/AppProvider";
 
 import { Toaster } from "react-hot-toast";
 
@@ -52,14 +53,14 @@ export default function RootLayout({ children }) {
         className={`${inter.className} h-screen grid grid-rows-[auto_1fr_auto]`} // Fixed template string
       >
         <Toaster position="top-center" reverseOrder={false} />
-        {/* <Navbar /> */}
-        <StoreProvider>
-          <Navbar />
+        <AppProvider>
+          <StoreProvider>
+            <Navbar />
 
-          <main className="w-full h-full mt-32 md:mt-14">{children}</main>
-          <Footer />
-        </StoreProvider>
-        {/* <Footer /> */}
+            <main className="w-full h-full mt-32 md:mt-14">{children}</main>
+            <Footer />
+          </StoreProvider>
+        </AppProvider>
       </body>
     </html>
   );
