@@ -1,7 +1,9 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useUser } from "../../contexts/UserContext";
+import { Button } from "../ui/button";
 
 const servicesMenu = [
   { title: "Customizable Templates", url: "/customizable-template" },
@@ -17,7 +19,8 @@ function Navbar() {
   const [isServicesOpen, setServicesOpen] = useState(false);
   const dropdownRef = useRef(null);
   const servicesButtonRef = useRef(null);
-  const { isAuthenticated } = useUser();
+  const { isAuthenticated, removeUserData } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     // Function to handle clicks outside the dropdown
@@ -40,11 +43,21 @@ function Navbar() {
     };
   }, []);
 
+  const handleLogout = () => {
+    removeUserData();
+
+    router.push("/auth/login");
+  };
+
+  const handleLogin = () => {
+    router.push("/auth/login");
+  };
+
   return (
     <div className="navbar bg-[white] font_barlow p-10 flex justify-between max-h-[4vh] max-w-[80vw] rounded-3xl fixed top-1 left-0 right-0 mx-auto z-50 mt-5 ring-2 ring-[#1b93a657] shadow-2xl">
       {/* Navbar start */}
       <div className="navbar-start">
-        {/* Burger icon on the small screens */}
+        {/* small screens navbar */}
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
             <svg
@@ -64,7 +77,7 @@ function Navbar() {
           </div>
           <ul
             tabIndex={0}
-            className="menu menu-sm dropdown-content rounded-box mt-3 w-52 p-2 shadow text-[#1B94A6] !important z-20"
+            className="menu menu-sm dropdown-content rounded-box mt-3 w-52 p-2 shadow text-[#1B94A6] !bg-white z-100"
           >
             <li>
               <Link href={"/"}>Home</Link>
@@ -119,6 +132,21 @@ function Navbar() {
 
             <li>
               <Link href={"/contact-us"}>Contact Us</Link>
+            </li>
+            <li>
+              {isAuthenticated ? (
+                <Button onClick={handleLogout} variant="destructive">
+                  Logout
+                </Button>
+              ) : (
+                <Button
+                  href={"/auth/register"}
+                  onClick={handleLogin}
+                  className="bg-[#1B94A6] text-white hover:bg-[#1b93a6da]"
+                >
+                  Signin
+                </Button>
+              )}
             </li>
           </ul>
         </div>
@@ -190,12 +218,23 @@ function Navbar() {
 
       {/* Navbar end */}
       <div className="navbar-end hidden lg:flex lg:justify-end">
-        <Link
-          href={"/auth/register"}
-          className="btn bg-[#1B94A6] !important] text-white hover:bg-[#1B94A6] hover:scale-110"
-        >
-          Sign Up Now
-        </Link>
+        {isAuthenticated ? (
+          <Button
+            onClick={handleLogout}
+            variant="destructive"
+            // className="btn bg-[#1B94A6] !important] text-white hover:bg-[#1B94A6] hover:scale-110"
+          >
+            Logout
+          </Button>
+        ) : (
+          <Button
+            href={"/auth/register"}
+            onClick={handleLogin}
+            className="bg-[#1B94A6] text-white hover:bg-[#1b93a6da]"
+          >
+            Signin
+          </Button>
+        )}
       </div>
     </div>
   );
