@@ -11,7 +11,7 @@ const TemplateCard = () => {
   };
 
   return (
-    <div className="flex justify-center items-center  bg-gray-100 rounded-xl ring-2 ring-[#1B94A6] shadow-2xl">
+    <div className="flex justify-center items-center  bg-gray-100 rounded-xl ring-2 ring-[#1B94A6] shadow-xl">
       <div className="relative w-64 h-80 overflow-hidden rounded-lg shadow-lg group">
         {/* Background Image */}
         <div

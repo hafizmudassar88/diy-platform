@@ -57,7 +57,7 @@ export default function RootLayout({ children }) {
           <StoreProvider>
             <Navbar />
 
-            <main className="w-full h-full mt-32 md:mt-14">{children}</main>
+            <main className="w-full h-full mt-32 md:mt-14 !bg-white">{children}</main>
             <Footer />
           </StoreProvider>
         </AppProvider>
