@@ -1,11 +1,10 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "../redux/store/StoreProvider";
-import Navbar from "../components/core/Navbar";
-import Footer from "../components/core/Footer"; // Fixed Footer import path
 import AppProvider from "../contexts/AppProvider";
 
 import { Toaster } from "react-hot-toast";
+import ClientLayout from "./clientLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -55,10 +54,7 @@ export default function RootLayout({ children }) {
         <Toaster position="top-center" reverseOrder={false} />
         <AppProvider>
           <StoreProvider>
-            <Navbar />
-
-            <main className="w-full h-full mt-32 md:mt-14 !bg-white">{children}</main>
-            <Footer />
+            <ClientLayout>{children}</ClientLayout>
           </StoreProvider>
         </AppProvider>
       </body>
