@@ -31,7 +31,7 @@ const TemplateCard = () => {
               Preview
             </Link>
             <Link
-              href="/templete/editor/Home/Hero"
+              href="/templete/editor"
               className="px-4 py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-500"
             >
               Choose

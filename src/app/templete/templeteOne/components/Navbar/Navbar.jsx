@@ -39,7 +39,7 @@ const NavbarTemplete = () => {
             );
           })}
           <Link
-            href="/templete/editor/Home/Hero"
+            href="/templete/editor"
             className="px-4 py-2 bg-[#1B94A6] text-white font-semibold rounded "
           >
             Choose Templete

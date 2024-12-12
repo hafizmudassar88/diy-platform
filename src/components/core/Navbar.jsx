@@ -181,13 +181,13 @@ function Navbar() {
             </Link>
           </li>
 
-          {isAuthenticated && (
-            <li className="m-1">
-              <Link href={"/templete"} className="me-1 w-full">
-                Templates
-              </Link>
-            </li>
-          )}
+          {/* {isAuthenticated && ( */}
+          <li className="m-1">
+            <Link href={"/templete"} className="me-1 w-full">
+              Templates
+            </Link>
+          </li>
+          {/* )} */}
 
           <li className="m-1 relative group">
             <Link href={"/services"} className="w-full">
