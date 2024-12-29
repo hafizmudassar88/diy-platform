@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useState } from "react";
+import useFileUpload from "@/hooks/useFileUpload";
 
 const schema = z.object({
   logoImage: z.string().min(1, "Logo image is required"),
@@ -44,9 +45,23 @@ export function HomeForm() {
     },
   });
 
-  const onSubmit = (data) => {
+  const { uploading, uploadedFileUrl, uploadFile } = useFileUpload();
 
-    console.log('home data')
+  const handleFileChange = async (e, setFile) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    try {
+      const uploadedUrl = await uploadFile(selectedFile);
+      setFile(uploadedUrl);
+      console.log("Uploaded File URL:", uploadedUrl);
+    } catch (error) {
+      console.error("Failed to upload file:", error.message);
+    }
+  };
+
+  const onSubmit = (data) => {
+    console.log("home data");
 
     updateFormData("home", {
       ...data,
@@ -55,13 +70,12 @@ export function HomeForm() {
     });
   };
 
-  const handleSelectedLogoImageChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedLogoImage(file);
+  const handleSelectedLogoImageChange = async (e) => {
+    await handleFileChange(e, setSelectedLogoImage);
   };
-  const handleSelectedHeroSectionImageChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedHeroSectionImage(file);
+
+  const handleSelectedHeroSectionImageChange = async (e) => {
+    await handleFileChange(e, setSelectedHeroSectionImage);
   };
 
   return (
@@ -85,7 +99,7 @@ export function HomeForm() {
                 />
               </FormControl>
               <FormDescription>
-                {selectedLogoImage?.name || "Required: Choose your logo image"}
+                {selectedLogoImage || "Required: Choose your logo image"}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -157,7 +171,7 @@ export function HomeForm() {
                 />
               </FormControl>
               <FormDescription>
-                {selectedHeroSectionImage?.name ||
+                {selectedHeroSectionImage ||
                   "Required: Choose your hero section image"}
               </FormDescription>
               <FormMessage />

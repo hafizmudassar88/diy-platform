@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useState } from "react";
+import useFileUpload from "@/hooks/useFileUpload";
 
 const schema = z.object({
   bioImage: z.string().min(1, "Bio image is required"),
@@ -34,13 +35,23 @@ export function AboutForm() {
     defaultValues: { ...formData.about, bioImage: "" },
   });
 
-  const onSubmit = (data) => {
-    updateFormData("about", { ...data, bioImage: SelectedBioImage });
+  const { uploading, uploadedFileUrl, uploadFile } = useFileUpload();
+
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    try {
+      const uploadedUrl = await uploadFile(selectedFile);
+      setSelectedBioImage(uploadedUrl);
+      console.log("Uploaded File URL:", uploadedUrl);
+    } catch (error) {
+      console.error("Failed to upload file:", error.message);
+    }
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedBioImage(file);
+  const onSubmit = (data) => {
+    updateFormData("about", { ...data, bioImage: SelectedBioImage });
   };
 
   return (
@@ -64,7 +75,7 @@ export function AboutForm() {
                 />
               </FormControl>
               <FormDescription>
-                {SelectedBioImage?.name || "Required: Choose your bio image"}
+                {SelectedBioImage || "Required: Choose your bio image"}
               </FormDescription>
               <FormMessage />
             </FormItem>

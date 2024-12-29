@@ -1,6 +1,5 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import StoreProvider from "../redux/store/StoreProvider";
 import AppProvider from "../contexts/AppProvider";
 
 import { Toaster } from "react-hot-toast";
@@ -53,9 +52,7 @@ export default function RootLayout({ children }) {
       >
         <Toaster position="top-center" reverseOrder={false} />
         <AppProvider>
-          <StoreProvider>
-            <ClientLayout>{children}</ClientLayout>
-          </StoreProvider>
+          <ClientLayout>{children}</ClientLayout>
         </AppProvider>
       </body>
     </html>

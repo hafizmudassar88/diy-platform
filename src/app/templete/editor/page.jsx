@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "@/contexts/FormContext";
 import { HomeForm } from "./components/HomeForm";
 import { AboutForm } from "./components/AboutForm";
@@ -8,12 +8,14 @@ import { ContactForm } from "./components/ContactForm";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useRouter } from "next/navigation";
+import axiosInstance from "@/lib/axios";
+import toast from "react-hot-toast";
 
 export default function Editor() {
   const [activeTab, setActiveTab] = useState("home");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
-  const { isTemplateEmpty } = useFormContext();
+  const { isTemplateEmpty, formData } = useFormContext();
 
   const tabs = [
     { id: "home", label: "Home" },
@@ -37,7 +39,18 @@ export default function Editor() {
   const backToWebsite = () => {
     router.push("/");
   };
-  const publishWebsite = () => {
+  const publishWebsite = async () => {
+    console.log("formData: ", formData);
+
+    const response = await axiosInstance.post("/template/create", formData);
+
+    if (response.status !== 200) {
+      toast.error(response?.data?.message);
+      return;
+    }
+
+    toast.success("Template created successfully");
+
     router.push("/");
   };
 

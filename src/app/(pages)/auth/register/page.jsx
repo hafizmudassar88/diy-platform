@@ -68,7 +68,7 @@ export default function SignUp() {
       toast.success("Registered successfully");
 
       reset();
-      router.push("/login");
+      router.push("/auth/login");
     } catch (error) {
       console.error("Error while signup:", error);
 

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 
-const TemplateCard = ({ data }) => {
+const PublishedTemplateCard = ({ data }) => {
   const template = data?.details?.home;
 
   useEffect(() => {
@@ -28,10 +28,10 @@ const TemplateCard = ({ data }) => {
           </p>
           <div className="flex gap-4">
             <Link
-              href="/templete/templeteOne"
+              href={`/templete/${data?._id}`}
               className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-500"
             >
-              Preview
+              View
             </Link>
             <Link
               href="/templete/editor"
@@ -46,4 +46,4 @@ const TemplateCard = ({ data }) => {
   );
 };
 
-export default TemplateCard;
+export default PublishedTemplateCard;
