@@ -15,7 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useFileUpload from "@/hooks/useFileUpload";
 
 const schema = z.object({
@@ -26,26 +26,28 @@ const schema = z.object({
   heroSectionImage: z.string().min(1, "Hero section image is required"),
 });
 
-export function HomeForm() {
-  const { formData, updateFormData } = useFormContext();
+export function HomeForm({ data }) {
+  const { updateFormData } = useFormContext();
 
   const [selectedLogoImage, setSelectedLogoImage] = useState(
-    formData?.home?.logoImage || null
+    data?.logoImage || null
   );
   const [selectedHeroSectionImage, setSelectedHeroSectionImage] = useState(
-    formData?.home?.heroSectionImage || null
+    data?.heroSectionImage || null
   );
 
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      ...formData.home,
-      logoImage: selectedLogoImage,
-      heroSectionImage: selectedHeroSectionImage,
+      logoImage: data?.logoImage || "",
+      name: data?.name || "",
+      tagLine: data?.tagLine || "",
+      description: data?.description || "",
+      heroSectionImage: data?.heroSectionImage || "",
     },
   });
 
-  const { uploading, uploadedFileUrl, uploadFile } = useFileUpload();
+  const { uploading, uploadFile } = useFileUpload();
 
   const handleFileChange = async (e, setFile) => {
     const selectedFile = e.target.files[0];
@@ -60,11 +62,11 @@ export function HomeForm() {
     }
   };
 
-  const onSubmit = (data) => {
-    console.log("home data");
+  const onSubmit = (formData) => {
+    console.log("home data", formData);
 
     updateFormData("home", {
-      ...data,
+      ...formData,
       logoImage: selectedLogoImage,
       heroSectionImage: selectedHeroSectionImage,
     });
@@ -81,6 +83,7 @@ export function HomeForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Logo Image */}
         <FormField
           control={form.control}
           name="logoImage"
@@ -105,6 +108,8 @@ export function HomeForm() {
             </FormItem>
           )}
         />
+
+        {/* Name */}
         <FormField
           control={form.control}
           name="name"
@@ -121,6 +126,8 @@ export function HomeForm() {
             </FormItem>
           )}
         />
+
+        {/* Tagline */}
         <FormField
           control={form.control}
           name="tagLine"
@@ -137,6 +144,8 @@ export function HomeForm() {
             </FormItem>
           )}
         />
+
+        {/* Description */}
         <FormField
           control={form.control}
           name="description"
@@ -153,6 +162,8 @@ export function HomeForm() {
             </FormItem>
           )}
         />
+
+        {/* Hero Section Image */}
         <FormField
           control={form.control}
           name="heroSectionImage"
@@ -178,6 +189,7 @@ export function HomeForm() {
             </FormItem>
           )}
         />
+
         <Button type="submit">Save Home Data</Button>
       </form>
     </Form>

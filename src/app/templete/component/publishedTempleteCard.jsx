@@ -3,6 +3,7 @@ import Link from "next/link";
 
 const PublishedTemplateCard = ({ data }) => {
   const template = data?.details?.home;
+  const templateId = data?._id;
 
   useEffect(() => {
     console.log("data: ", data);
@@ -34,10 +35,10 @@ const PublishedTemplateCard = ({ data }) => {
               View
             </Link>
             <Link
-              href="/templete/editor"
+              href={`/templete/editor/?templateId=${templateId}`}
               className="px-4 py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-500"
             >
-              Choose
+              Update
             </Link>
           </div>
         </div>

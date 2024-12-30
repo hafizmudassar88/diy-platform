@@ -24,15 +24,20 @@ const schema = z.object({
   bio: z.string().min(1, "Bio is required"),
 });
 
-export function AboutForm() {
+export function AboutForm({ data }) {
   const { formData, updateFormData } = useFormContext();
   const [SelectedBioImage, setSelectedBioImage] = useState(
-    formData?.about?.bioImage || null
+    data?.bioImage || null
   );
 
   const form = useForm({
     resolver: zodResolver(schema),
-    defaultValues: { ...formData.about, bioImage: "" },
+    // defaultValues: { ...formData.about, bioImage: "" },
+    defaultValues: {
+      bioImage: data?.bioImage || "",
+      title: data?.title || "",
+      bio: data?.bio || "",
+    },
   });
 
   const { uploading, uploadedFileUrl, uploadFile } = useFileUpload();
