@@ -1,5 +1,5 @@
 "use client";
-import { staticNavItems } from "./components/itemLink";
+import { navItems } from "./components/itemLink";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -21,7 +21,7 @@ const NavbarTemplete = () => {
           <Image src={logo} alt="ShwraLogo" width={100} />
         </div>
         <div className=" flex justify-center items-center h-16  flex-row gap-12 ">
-          {staticNavItems?.map((item, index) => {
+          {navItems?.map((item, index) => {
             const isActive = pathname === item.url;
 
             return (
@@ -38,12 +38,12 @@ const NavbarTemplete = () => {
               </Link>
             );
           })}
-          <Link
+          {/* <Link
             href="/templete/editor"
             className="px-4 py-2 bg-[#1B94A6] text-white font-semibold rounded "
           >
             Choose Templete
-          </Link>
+          </Link> */}
         </div>
       </div>
 
@@ -62,7 +62,7 @@ const NavbarTemplete = () => {
       >
         <div className="flex items-center justify-between px-4 py-3">DIY</div>
         <div className="flex flex-col gap-10 px-4 justify-center mt-16 font-semibold">
-          {staticNavItems?.map((item, index) => {
+          {navItems?.map((item, index) => {
             const isActive = pathname === item.url;
 
             return (

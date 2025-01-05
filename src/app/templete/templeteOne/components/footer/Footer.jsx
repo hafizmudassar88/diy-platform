@@ -7,12 +7,12 @@ import { navItems } from "../Navbar/components/itemLink";
 
 function FooterTemplete() {
   return (
-    <footer className=" text- py-10 bg-primaryLight ring-2 py-10">
+    <footer className="py-10 bg-primaryLight ring-2">
       <div className="max-w-4xl mx-auto text-center my-10">
         <p className="mb-2 text-sm">
-          © {new Date().getFullYear()} Your Company Name. All rights reserved.
+          © {new Date().getFullYear()} All rights reserved.
         </p>
-        <div className="flex justify-center space-x-4 gap-10">
+        <div className="flex justify-center space-x-4 gap-10 mt-8">
           {navItems?.map((item, index) => {
             return (
               <Link
@@ -25,9 +25,6 @@ function FooterTemplete() {
             );
           })}
         </div>
-        <p className="mt-4 text-xs text-gray-500">
-          Built with ❤️ using Next.js and Tailwind CSS
-        </p>
       </div>
     </footer>
   );

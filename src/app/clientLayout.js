@@ -6,11 +6,9 @@ import Footer from "@/components/core/Footer";
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
-  const isPublicRoute = [
-    "/auth/login",
-    "/auth/signup",
-    "/templete/editor",
-  ].includes(pathname);
+  const isPublicRoute =
+    ["/auth/login", "/auth/signup", "/templete/editor"].includes(pathname) ||
+    pathname.startsWith("/templete/");
 
   return (
     <>

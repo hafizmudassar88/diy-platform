@@ -2,12 +2,7 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 
 const TemplateCard = ({ data }) => {
-  const template = data?.details?.home;
-
-  useEffect(() => {
-    console.log("data: ", data);
-    console.log("template: ", template);
-  }, [data]);
+  const template = data
 
   return (
     <div className="flex justify-center items-center bg-gray-100 rounded-xl ring-2 ring-[#1B94A6] shadow-xl">

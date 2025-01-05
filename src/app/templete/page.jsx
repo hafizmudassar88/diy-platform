@@ -5,6 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTemplateData } from "@/redux/templateSlice";
 import PublishedTemplateCard from "./component/publishedTempleteCard";
 
+// Sample JSON data
+const editableTemplate = {
+  logoImage: "/images/bannerImage.png",
+  name: "Template Title",
+  description: "This is a template description",
+};
+
 const TemplatesPages = () => {
   const dispatch = useDispatch();
   const { data, status, error } = useSelector((state) => state.template);
@@ -25,7 +32,7 @@ const TemplatesPages = () => {
           Pick the one you love and customize it for your new website
         </div>
         <div className="mt-5">
-          <TemplateCard />
+          <TemplateCard data={editableTemplate} />
         </div>
       </div>
 

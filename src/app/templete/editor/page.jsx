@@ -177,13 +177,15 @@ export default function Editor() {
             <h1 className="text-2xl font-bold mb-4">
               {tabs.find((tab) => tab.id === activeTab)?.label}
             </h1>
-            {loading ? (
+            {/* {loading ? (
               <p>Loading template data...</p>
             ) : error ? (
               <p className="text-red-500">{error}</p>
             ) : (
               renderForm()
-            )}
+            )} */}
+
+            {renderForm()}
           </div>
         </div>
       </main>

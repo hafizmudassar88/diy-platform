@@ -1,10 +1,11 @@
 import Image from "next/image";
-import React from "react";
-// import { Images } from "../../../../public/assets/Images";
+import React, { useEffect } from "react";
 import about from "../../../../../../public/images/about.png";
-import Button from "./Button";
 
-const About = () => {
+const About = ({ data }) => {
+  useEffect(() => {
+    console.log("hero details: ", data);
+  }, [data]);
   return (
     <>
       <div className="text-center my-16 max-w-7xl mx-auto px-5 bg-[#1B94A6] rounded-lg ">
@@ -51,7 +52,7 @@ const Card = ({ title, description, buttonText, imageUrl }) => {
         <h2 className="text-xl font-semibold text-[#1B94A6] mb-2">{title}</h2>
         <p className="text-gray-600 mb-4">{description}</p>
         <div className="flex justify-center">
-          <Button link="" text={buttonText} />
+          <button>{buttonText}</button>
         </div>
       </div>
     </div>
