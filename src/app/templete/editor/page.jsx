@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useFormContext } from "@/contexts/FormContext";
 import { HomeForm } from "./components/HomeForm";
 import { AboutForm } from "./components/AboutForm";
@@ -12,7 +12,7 @@ import axiosInstance from "@/lib/axios";
 import toast from "react-hot-toast";
 import useTemplate from "@/hooks/useTemplate";
 
-export default function Editor() {
+function EditorContent() {
   const [activeTab, setActiveTab] = useState("home");
   const [templateId, setTemplateId] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -177,18 +177,18 @@ export default function Editor() {
             <h1 className="text-2xl font-bold mb-4">
               {tabs.find((tab) => tab.id === activeTab)?.label}
             </h1>
-            {/* {loading ? (
-              <p>Loading template data...</p>
-            ) : error ? (
-              <p className="text-red-500">{error}</p>
-            ) : (
-              renderForm()
-            )} */}
-
             {renderForm()}
           </div>
         </div>
       </main>
     </div>
+  );
+}
+
+export default function Editor() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <EditorContent />
+    </Suspense>
   );
 }
