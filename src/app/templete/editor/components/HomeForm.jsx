@@ -17,7 +17,10 @@ import {
 } from "@/components/ui/form";
 import { useState, useEffect } from "react";
 import useFileUpload from "@/hooks/useFileUpload";
+import { CheckCircle } from "lucide-react"; // For the green checkmark icon
+import { toast } from "react-hot-toast"; // For toast notifications
 
+// Zod schema for form validation
 const schema = z.object({
   logoImage: z.string().min(1, "Logo image is required"),
   name: z.string().min(1, "Name is required"),
@@ -27,8 +30,11 @@ const schema = z.object({
 });
 
 export function HomeForm({ data }) {
-  const { updateFormData } = useFormContext();
+  const { formData, updateFormData } = useFormContext();
 
+  const { home } = formData;
+
+  // State for uploaded images
   const [selectedLogoImage, setSelectedLogoImage] = useState(
     data?.logoImage || null
   );
@@ -36,19 +42,39 @@ export function HomeForm({ data }) {
     data?.heroSectionImage || null
   );
 
+  // State to track if the form is saved
+  const [isSaved, setIsSaved] = useState(false);
+
+  // React Hook Form setup
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      logoImage: data?.logoImage || "",
-      name: data?.name || "",
-      tagLine: data?.tagLine || "",
-      description: data?.description || "",
-      heroSectionImage: data?.heroSectionImage || "",
+      logoImage: data?.logoImage || home?.logoImage || "",
+      name: data?.name || home?.name || "",
+      tagLine: data?.tagLine || home?.tagLine || "",
+      description: data?.description || home?.description || "",
+      heroSectionImage: data?.heroSectionImage || home?.heroSectionImage || "",
     },
   });
 
   const { uploading, uploadFile } = useFileUpload();
 
+  // Update form values when `data` changes
+  useEffect(() => {
+    if (data) {
+      form.reset({
+        logoImage: data.logoImage || "",
+        name: data.name || "",
+        tagLine: data.tagLine || "",
+        description: data.description || "",
+        heroSectionImage: data.heroSectionImage || "",
+      });
+      setSelectedLogoImage(data.logoImage || null);
+      setSelectedHeroSectionImage(data.heroSectionImage || null);
+    }
+  }, [data, form]);
+
+  // Handle file upload
   const handleFileChange = async (e, setFile) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
@@ -62,16 +88,28 @@ export function HomeForm({ data }) {
     }
   };
 
+  // Form submission handler
   const onSubmit = (formData) => {
     console.log("home data", formData);
 
+    // Update global form data
     updateFormData("home", {
       ...formData,
       logoImage: selectedLogoImage,
       heroSectionImage: selectedHeroSectionImage,
     });
+
+    // Show success feedback
+    setIsSaved(true);
+    toast.success("Home data saved successfully!");
+
+    // Reset the saved state after 3 seconds
+    setTimeout(() => {
+      setIsSaved(false);
+    }, 3000);
   };
 
+  // Handlers for file input changes
   const handleSelectedLogoImageChange = async (e) => {
     await handleFileChange(e, setSelectedLogoImage);
   };
@@ -89,12 +127,12 @@ export function HomeForm({ data }) {
           name="logoImage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Logo Image URL</FormLabel>
+              <FormLabel>Logo Image</FormLabel>
               <FormControl>
                 <Input
                   type="file"
                   accept="image/*"
-                  placeholder="Enter logo image URL"
+                  placeholder="Upload logo image"
                   onChange={(e) => {
                     field.onChange(e);
                     handleSelectedLogoImageChange(e);
@@ -102,7 +140,7 @@ export function HomeForm({ data }) {
                 />
               </FormControl>
               <FormDescription>
-                {selectedLogoImage || "Required: Choose your logo image"}
+                {selectedLogoImage || home?.logoImage || "Required: Choose your logo image"}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -169,12 +207,12 @@ export function HomeForm({ data }) {
           name="heroSectionImage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Hero Section Image URL</FormLabel>
+              <FormLabel>Hero Section Image</FormLabel>
               <FormControl>
                 <Input
                   type="file"
                   accept="image/*"
-                  placeholder="Enter hero section image"
+                  placeholder="Upload hero section image"
                   onChange={(e) => {
                     field.onChange(e);
                     handleSelectedHeroSectionImageChange(e);
@@ -182,7 +220,7 @@ export function HomeForm({ data }) {
                 />
               </FormControl>
               <FormDescription>
-                {selectedHeroSectionImage ||
+                {selectedHeroSectionImage || home?.heroSectionImage ||
                   "Required: Choose your hero section image"}
               </FormDescription>
               <FormMessage />
@@ -190,7 +228,16 @@ export function HomeForm({ data }) {
           )}
         />
 
-        <Button type="submit">Save Home Data</Button>
+        {/* Save Button and Success Feedback */}
+        <div className="flex items-center gap-2">
+          <Button type="submit">Save Home Data</Button>
+          {isSaved && (
+            <div className="flex items-center gap-1 text-green-600">
+              <CheckCircle className="h-4 w-4" />
+              <span>Saved!</span>
+            </div>
+          )}
+        </div>
       </form>
     </Form>
   );

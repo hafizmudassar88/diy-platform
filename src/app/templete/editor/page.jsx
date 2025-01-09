@@ -22,18 +22,10 @@ function EditorContent() {
 
   useEffect(() => {
     const id = searchParams.get("templateId");
-    if (id) {
-      setTemplateId(id);
-    }
+    setTemplateId(id);
   }, [searchParams]);
 
   const { templateData, loading, error } = useTemplate(templateId);
-
-  useEffect(() => {
-    if (templateData) {
-      console.log("template data: ", templateData);
-    }
-  }, [templateData]); // Logs when templateData changes
 
   const { details } = templateData || {};
 
@@ -85,7 +77,9 @@ function EditorContent() {
       );
       router.push("/");
     } catch (error) {
-      toast.error(`Failed to ${templateData?._id ? "updated" : "create"} template`);
+      toast.error(
+        `Failed to ${templateData?._id ? "updated" : "create"} template`
+      );
     }
   };
 
@@ -177,7 +171,13 @@ function EditorContent() {
             <h1 className="text-2xl font-bold mb-4">
               {tabs.find((tab) => tab.id === activeTab)?.label}
             </h1>
-            {renderForm()}
+            {loading && templateId ? (
+              <p>Loading template data...</p>
+            ) : error ? (
+              <p className="text-red-500">{error}</p>
+            ) : (
+              renderForm()
+            )}
           </div>
         </div>
       </main>

@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import TemplateCard from "./component/templeteCard";
 import { useDispatch, useSelector } from "react-redux";
-import { getTemplateData } from "@/redux/templateSlice";
+import { getTemplateData, removeTemplateData } from "@/redux/templateSlice";
 import PublishedTemplateCard from "./component/publishedTempleteCard";
 
 // Sample JSON data
@@ -17,12 +17,9 @@ const TemplatesPages = () => {
   const { data, status, error } = useSelector((state) => state.template);
 
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(getTemplateData());
-    }
-
-    console.log("data: " + JSON.stringify(data));
-  }, [dispatch, status]);
+    // Fetch data every time the component mounts
+    dispatch(getTemplateData());
+  }, [dispatch]);
 
   return (
     <div className="bg-white grid gap-y-20 mt-20 p-5 py-10">
@@ -42,7 +39,6 @@ const TemplatesPages = () => {
           {data.map((item, index) => (
             <PublishedTemplateCard key={index} data={item} />
           ))}
-          {/* <TemplateCard /> */}
         </div>
       </div>
     </div>
