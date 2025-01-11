@@ -190,7 +190,7 @@ export function HomeForm({ data }) {
           )}
         />
 
-        <Button type="submit">Save Home Data</Button>
+        <Button type="submit">Save Blog Data</Button>
       </form>
     </Form>
   );

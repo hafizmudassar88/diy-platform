@@ -11,6 +11,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import axiosInstance from "@/lib/axios";
 import toast from "react-hot-toast";
 import useTemplate from "@/hooks/useTemplate";
+import BlogForm from "./components/BlogForm";
+import ResearchForm from "./components/ResearchForm";
 
 function EditorContent() {
   const [activeTab, setActiveTab] = useState("home");
@@ -41,6 +43,8 @@ function EditorContent() {
     { id: "home", label: "Home" },
     { id: "about", label: "About" },
     { id: "contact", label: "Contact Us" },
+    { id: "blogs", label: "Blog" },
+    { id: "research", label: "Research" },
   ];
 
   const renderForm = () => {
@@ -51,6 +55,10 @@ function EditorContent() {
         return <AboutForm data={details?.about} />;
       case "contact":
         return <ContactForm data={details?.contact} />;
+      case "blogs":
+        return <BlogForm data={details?.blogs} />;
+      case "research":
+        return <ResearchForm data={details?.research} />;
       default:
         return null;
     }
@@ -85,7 +93,9 @@ function EditorContent() {
       );
       router.push("/");
     } catch (error) {
-      toast.error(`Failed to ${templateData?._id ? "updated" : "create"} template`);
+      toast.error(
+        `Failed to ${templateData?._id ? "updated" : "create"} template`
+      );
     }
   };
 
