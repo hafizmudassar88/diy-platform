@@ -12,7 +12,7 @@ const AboutPage = () => {
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-black to-transparent z-0 opacity-50"></div>{" "}
             {/* Gradient background */}
             <Image
-              src={"/images/bannerImage.png"}
+              src={"/images/creativity.svg"}
               alt="Description"
               width={500}
               height={500}
@@ -23,15 +23,15 @@ const AboutPage = () => {
       </div>
       <div className="md:w-1/2 flex justify-center items-center flex-col py-4">
         <h1 className="text-[32px] text-white font-semibold py-5 ">
-          Redefining Elegance with DIY
+          Celebrating Creativity and Individuality{" "}
         </h1>
         <p className="text-white px-6">
-          At DIY, we believe that style is an expression of individuality, and
-          elegance is timeless. Our mission is to create products that blend
-          modern trends with classic sophistication, crafted with the highest
-          quality materials. From concept to creation, every item in the DIY
-          collection is designed to elevate your lifestyle and add a touch of
-          refined luxury to your everyday moments.
+          At DIY, we embrace the art of self-expression and creativity. Our
+          platform is dedicated to empowering individuals to showcase their
+          unique style and ideas. We combine modern innovation with timeless
+          sophistication to provide tools and inspiration for crafting projects
+          that elevate everyday living. From concept to completion, DIY is your
+          space to redefine elegance and bring your vision to life.
         </p>
       </div>
     </div>

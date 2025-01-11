@@ -15,11 +15,18 @@ const NavbarTemplete = () => {
   return (
     <>
       <div
-        className={` hidden md:flex justify-around flex-row items-center h-16 bg-primaryLight z-30 text-black text-[16px]`}
+        className={`hidden md:flex justify-around flex-row items-center h-16 bg-white z-30 text-black text-[16px]`}
       >
         <div className="">
-          <Image src={logo} alt="ShwraLogo" width={100} />
+          <Image
+            src="/images/scholar.svg"
+            alt="ScholarLogo"
+            width={80}
+            height={80}
+            priority
+          />
         </div>
+
         <div className=" flex justify-center items-center h-16  flex-row gap-12 ">
           {staticNavItems?.map((item, index) => {
             const isActive = pathname === item.url;

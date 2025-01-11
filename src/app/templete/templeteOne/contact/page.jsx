@@ -126,7 +126,7 @@ const ContactPage = () => {
         {/* Right Section */}
         <div className="flex flex-col lg:w-1/3 justify-center items-center mt-5">
           <p className="text-[#1B94A6] text-[32px] font-semibold">Contact Us</p>
-          <p>info@DIY.com</p>
+          <p>info@diy.com</p>
           <p className="text-[#1B94A6] text-[32px] font-semibold mt-5">
             Address
           </p>

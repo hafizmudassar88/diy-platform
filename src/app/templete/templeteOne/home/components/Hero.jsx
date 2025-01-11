@@ -1,21 +1,22 @@
-import bannerImage from "../../../../../../public/images/bannerImage.png";
+import bannerImage from "../../../../../../public/images/business-strategy.png";
 import Image from "next/image";
 
 const Hero = () => {
-
   return (
-    <div className="flex md:flex-row flex-col w-full md:py-32 bg-primaryLight">
+    <div className="flex md:flex-row flex-col w-full md:py-32 bg-white">
       {/* Text Section */}
       <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left md:w-1/2 lg:ms-32 md:ms-8 px-4 md:px-0">
         <h1 className="text-5xl font-bold text-[#1B94A6] capitalize">
-          Welcome to AutoLux
+          Empowering Minds, Sharing Knowledge{" "}
         </h1>
         <h1 className="text-2xl font-bold text-[#1B94A6] capitalize">
-          Your Ultimate Car Destination!
+          Create, Publish, and Inspire – Your Research, Your Voice
         </h1>
         <p className="text-[16px] mt-4">
-          At AutoLux, we bring you a diverse range of cars, from luxury sedans
-          and powerful SUVs to eco-friendly hybrids and electric vehicles
+          Welcome to the platform where scholars and students connect, create,
+          and contribute to the world of knowledge. Publish your educational
+          blogs and research for free, reach a global audience, and collaborate
+          with like-minded thinkers to make a lasting impact.{" "}
         </p>
         <div className="mt-8 flex justify-center">
           <button className="bg-[#1B94A6] text-white px-2 py-1 rounded-md">
