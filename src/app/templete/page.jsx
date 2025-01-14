@@ -1,9 +1,11 @@
 "use client";
 import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import TemplateCard from "./component/templeteCard";
 import { useDispatch, useSelector } from "react-redux";
 import { getTemplateData, removeTemplateData } from "@/redux/templateSlice";
 import PublishedTemplateCard from "./component/publishedTempleteCard";
+import { useUser } from "@/contexts/UserContext";
 
 // Sample JSON data
 const editableTemplate = {
@@ -13,13 +15,26 @@ const editableTemplate = {
 };
 
 const TemplatesPages = () => {
+  const router = useRouter();
+  const { isAuthenticated } = useUser();
+
   const dispatch = useDispatch();
   const { data, status, error } = useSelector((state) => state.template);
 
   useEffect(() => {
-    // Fetch data every time the component mounts
-    dispatch(getTemplateData());
-  }, [dispatch]);
+    if (!isAuthenticated) {
+      // Redirect to home page if not authenticated
+      router.push("/");
+    } else {
+      // Fetch data only if authenticated
+      dispatch(getTemplateData());
+    }
+  }, [isAuthenticated, router, dispatch]);
+
+  if (!isAuthenticated) {
+    // Return null or a loading spinner while redirecting
+    return null;
+  }
 
   return (
     <div className="bg-white grid gap-y-20 mt-20 p-5 py-10">

@@ -9,6 +9,7 @@ import axiosInstance from "../../../../lib/axios";
 import { useUser } from "../../../../contexts/UserContext";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import GoogleLoginButton from "@/components/core/GoogleLoginButton";
 
 // Zod schema for form validation
 const loginSchema = z.object({
@@ -69,21 +70,20 @@ export default function Login() {
       router.push("/");
     } catch (error) {
       console.error("Error while login:", error);
-    
+
       // Extracting a user-friendly error message
       const errorMessage =
         error?.response?.data?.message || // API error message
         error?.message || // General error message
         "Error while login, try again."; // Fallback message
-    
+
       // Displaying the error message using toast
       toast.error(errorMessage);
     }
-    
   };
 
   return (
-    <div className="flex justify-center items-center custom-font h-full md:mb-16 mb-8 md:mt-16 mt-32 flex-col">
+    <div className="flex justify-center items-center custom-font max-h-screen md:mb-16 mb-8 md:mt-16 mt-32 flex-col">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="flex max-w-lg gap-4 w-full rounded-xl flex-col md:px-0 px-3"
@@ -152,9 +152,14 @@ export default function Login() {
           Login
         </button>
 
+        {/* google login button  */}
+        <div className="mt-6 mx-auto">
+          <GoogleLoginButton />
+        </div>
+
         {/* Footer */}
         <div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 text-center">
             Don&apos;t have an account?{" "}
             <Link
               href={`/auth/register`}

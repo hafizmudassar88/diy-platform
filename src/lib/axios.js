@@ -3,10 +3,10 @@ import https from "https";
 
 // Create an axios instance
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "https://164.92.77.252", // Replace with your server's IP if needed
-  httpsAgent: new https.Agent({
-    rejectUnauthorized: false, // Disable SSL certificate validation
-  }),
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // Replace with your server's IP if needed
+  // httpsAgent: new https.Agent({
+  //   rejectUnauthorized: false, // Disable SSL certificate validation
+  // }),
   // withCredentials: true,
 });
 

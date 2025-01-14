@@ -1,9 +1,21 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { navItems } from "../Navbar/components/itemLink";
+import { useParams } from "next/navigation";
 
 function FooterTemplete() {
+
+  const params = useParams();
+
+  const id = params?.id || "default-id";
+
+  const navItems = [
+    { name: "Home", url: `/templete/${id}` },
+    { name: "About Us", url: `/templete/${id}/about` },
+    { name: "Contact Us", url: `/templete/${id}/contact` },
+    { name: "Blogs", url: `/templete/${id}/blogs` },
+    { name: "Research", url: `/templete/${id}/research` },
+  ];
   return (
     <footer className="py-10 bg-primaryLight ring-2">
       <div className="max-w-4xl mx-auto text-center my-10">

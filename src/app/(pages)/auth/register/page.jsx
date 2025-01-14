@@ -7,6 +7,7 @@ import Link from "next/link";
 import axiosInstance from "../../../../lib/axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import GoogleLoginButton from "@/components/core/GoogleLoginButton";
 
 // Validation schema using Zod
 const signUpSchema = z
@@ -181,8 +182,13 @@ export default function SignUp() {
           Sign Up
         </button>
 
+        {/* google login button  */}
+        <div className="mt-6 mx-auto">
+          <GoogleLoginButton />
+        </div>
+
         <div className="mt-2">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 text-center">
             Already have an account?{" "}
             <Link
               href={`/auth/login`}
