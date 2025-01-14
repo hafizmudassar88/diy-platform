@@ -17,7 +17,10 @@ import {
 } from "@/components/ui/form";
 import { useState } from "react";
 import useFileUpload from "@/hooks/useFileUpload";
+import { CheckCircle } from "lucide-react"; // For the green checkmark icon
+import { toast } from "react-hot-toast"; // For toast notifications
 
+// Zod schema for form validation
 const schema = z.object({
   bioImage: z.string().min(1, "Bio image is required"),
   title: z.string().min(1, "Title is required"),
@@ -26,22 +29,30 @@ const schema = z.object({
 
 export function AboutForm({ data }) {
   const { formData, updateFormData } = useFormContext();
+
+  // State for uploaded bio image
   const [SelectedBioImage, setSelectedBioImage] = useState(
     data?.bioImage || null
   );
 
+  // State to track if the form is saved
+  const [isSaved, setIsSaved] = useState(false);
+
+  const { about } = formData;
+
+  // React Hook Form setup
   const form = useForm({
     resolver: zodResolver(schema),
-    // defaultValues: { ...formData.about, bioImage: "" },
     defaultValues: {
-      bioImage: data?.bioImage || "",
-      title: data?.title || "",
-      bio: data?.bio || "",
+      bioImage: data?.bioImage || about?.bioImage || "",
+      title: data?.title || about?.title || "",
+      bio: data?.bio || about?.bio || "",
     },
   });
 
-  const { uploading, uploadedFileUrl, uploadFile } = useFileUpload();
+  const { uploading, uploadFile } = useFileUpload();
 
+  // Handle file upload
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
@@ -55,19 +66,33 @@ export function AboutForm({ data }) {
     }
   };
 
+  // Form submission handler
   const onSubmit = (data) => {
+    console.log("About data", data);
+
+    // Update global form data
     updateFormData("about", { ...data, bioImage: SelectedBioImage });
+
+    // Show success feedback
+    setIsSaved(true);
+    toast.success("About data saved successfully!");
+
+    // Reset the saved state after 3 seconds
+    setTimeout(() => {
+      setIsSaved(false);
+    }, 3000);
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Bio Image */}
         <FormField
           control={form.control}
           name="bioImage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bio Image URL</FormLabel>
+              <FormLabel>Bio Image</FormLabel>
               <FormControl>
                 <Input
                   type="file"
@@ -80,12 +105,14 @@ export function AboutForm({ data }) {
                 />
               </FormControl>
               <FormDescription>
-                {SelectedBioImage || "Required: Choose your bio image"}
+                {SelectedBioImage || about?.bioImage || "Required: Choose your bio image"}
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Title */}
         <FormField
           control={form.control}
           name="title"
@@ -102,6 +129,8 @@ export function AboutForm({ data }) {
             </FormItem>
           )}
         />
+
+        {/* Bio */}
         <FormField
           control={form.control}
           name="bio"
@@ -118,7 +147,17 @@ export function AboutForm({ data }) {
             </FormItem>
           )}
         />
-        <Button type="submit">Save About Data</Button>
+
+        {/* Save Button and Success Feedback */}
+        <div className="flex items-center gap-2">
+          <Button type="submit">Save About Data</Button>
+          {isSaved && (
+            <div className="flex items-center gap-1 text-green-600">
+              <CheckCircle className="h-4 w-4" />
+              <span>Saved!</span>
+            </div>
+          )}
+        </div>
       </form>
     </Form>
   );

@@ -1,34 +1,55 @@
-import Image from "next/image";
+"use client";
 
-const AboutPage = ({ data }) => {
-  const {
-    title = "Your journey starts here!",
-    bio = "Our Platform",
-    bioImage = "Empowering Innovation",
-  } = data?.details?.about || {};
+import useTemplate from "@/hooks/useTemplate";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import LoadingSkeleton from "./LoadingSkeleton"; // A custom loading skeleton component
+import ErrorMessage from "../components/ErrorMessage";
+
+const AboutPage = () => {
+  const { id } = useParams(); // Extract dynamic route parameter
+  const { templateData, loading, error } = useTemplate(id); // Fetch template data
+
+  // Destructure data with fallback values
+  const { title, bio, bioImage } = templateData?.details?.about || {
+    title: "",
+    bio: "",
+    bioImage: "",
+  };
+
+  // Show loading skeleton while data is being fetched
+  if (loading) {
+    return <LoadingSkeleton />;
+  }
+
+  // Show error message if there's an error
+  if (error) {
+    return <ErrorMessage message={error.message} />;
+  }
 
   return (
-    <div className="bg-[#1B94A6] w-full md:min-h-[80vh] flex md:flex-row flex-col ">
-      <div className="md:w-1/2 ">
-        <div className="flex justify-center items-center min-h-[80vh]">
-          {" "}
-          {/* Optional: Add a background to the outer container */}
-          <div className="relative max-w-4xl w-full p-6">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-black to-transparent z-0 opacity-50"></div>{" "}
-            {/* Gradient background */}
-            <Image
-              src={bioImage || ""}
-              alt="Description"
-              width={500}
-              height={500}
-              className="rounded-xl  relative z-10" // Rounded corners with a shadow and white border
-            />
-          </div>
+    <div className="bg-[#1B94A6] w-full min-h-[80vh] flex flex-col md:flex-row">
+      {/* Image Section */}
+      <div className="md:w-1/2 flex justify-center items-center min-h-[80vh] p-6 ps-0">
+        <div className="relative max-w-4xl w-full">
+          <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-50 z-0" />
+          <Image
+            src={bioImage || "/default-image.jpg"} // Fallback image if bioImage is missing
+            alt={title || "About Image"}
+            width={500}
+            height={500}
+            className="rounded-xl relative z-10 object-cover"
+            priority // Prioritize loading for above-the-fold images
+          />
         </div>
       </div>
-      <div className="md:w-1/2 flex justify-center items-center flex-col py-4">
-        <h1 className="text-[32px] text-white font-semibold py-5 ">{title}</h1>
-        <p className="text-white px-6">{bio}</p>
+
+      {/* Content Section */}
+      <div className="md:w-1/2 flex flex-col justify-center items-center py-8 px-6">
+        <h1 className="text-3xl md:text-4xl text-white font-semibold mb-6 text-center">
+          {title}
+        </h1>
+        <p className="text-white text-lg text-center max-w-2xl">{bio}</p>
       </div>
     </div>
   );
