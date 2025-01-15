@@ -22,13 +22,42 @@ export const FormProvider = ({ children }) => {
     },
     about: { bioImage: "", title: "", bio: "" },
     contact: { email: "", address: "" },
+    blogs: [],
+    research: [],
   });
 
   // Function to update specific form data
-  const updateFormData = useCallback((tab, data) => {
+  const updateFormData = useCallback((tab, dataOrUpdater) => {
+    setFormData((prev) => {
+      if (typeof dataOrUpdater === "function") {
+        // If a function is passed, use it to update the state
+        return {
+          ...prev,
+          [tab]: dataOrUpdater(prev[tab]),
+        };
+      } else {
+        // If an object is passed, merge it with the existing state
+        return {
+          ...prev,
+          [tab]: { ...prev[tab], ...dataOrUpdater },
+        };
+      }
+    });
+  }, []);
+
+  // Function to add a new blog entry
+  const addBlogEntry = useCallback((newBlog) => {
     setFormData((prev) => ({
       ...prev,
-      [tab]: { ...prev[tab], ...data },
+      blogs: [...(prev.blogs || []), newBlog], // Ensure blogs is always an array
+    }));
+  }, []);
+
+  // Function to add a new research entry
+  const addResearchEntry = useCallback((newResearch) => {
+    setFormData((prev) => ({
+      ...prev,
+      research: [...(prev.research || []), newResearch], // Ensure research is always an array
     }));
   }, []);
 
@@ -48,7 +77,14 @@ export const FormProvider = ({ children }) => {
 
   return (
     <FormContext.Provider
-      value={{ formData, updateFormData, isTemplateEmpty, isPageEmpty }}
+      value={{
+        formData,
+        updateFormData,
+        addBlogEntry,
+        addResearchEntry,
+        isTemplateEmpty,
+        isPageEmpty,
+      }}
     >
       {children}
     </FormContext.Provider>

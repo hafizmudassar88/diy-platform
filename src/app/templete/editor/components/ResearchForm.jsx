@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,6 +16,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import useFileUpload from "@/hooks/useFileUpload";
+import { useFormContext } from "@/contexts/FormContext";
+import { CheckCircle } from "lucide-react"; // For the green checkmark icon
+import { toast } from "react-hot-toast"; // For toast notifications
 
 // Define the schema for the research form
 const schema = z.object({
@@ -26,45 +28,50 @@ const schema = z.object({
 });
 
 export default function ResearchForm() {
-  const [entries, setEntries] = useState([
-    {
-      id: 1,
-      title: "",
-      abstract: "",
-      researchPaper: "",
-    },
-  ]);
+  const { formData, addResearchEntry, updateFormData } = useFormContext();
+  const { research } = formData; // Pull research from global formData
+
+  // Initialize entries as an array, even if research is undefined
+  const [entries, setEntries] = useState(Array.isArray(research) ? research : []);
+
+  // Sync entries with formData.research whenever it changes
+  useEffect(() => {
+    if (Array.isArray(research)) {
+      setEntries(research);
+    }
+  }, [research]);
 
   const { uploadFile } = useFileUpload();
 
-  const addResearchEntry = () => {
-    setEntries([
-      ...entries,
-      {
-        id: entries.length + 1,
-        title: "",
-        abstract: "",
-        researchPaper: "",
-      },
-    ]);
-  };
-
+  // Function to handle file upload
   const handleFileChange = async (e, setFileCallback) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
     try {
-      const uploadedUrl = await uploadFile(selectedFile);
-      setFileCallback(uploadedUrl);
+      const uploadedUrl = await uploadFile(selectedFile); // Upload the file
+      setFileCallback(uploadedUrl); // Update the state with the uploaded file URL
     } catch (error) {
       console.error("File upload failed:", error.message);
     }
   };
 
+  // Function to add a new research entry
+  const handleAddResearchEntry = () => {
+    const newEntry = {
+      id: entries.length + 1,
+      title: "",
+      abstract: "",
+      researchPaper: "",
+    };
+    setEntries([...entries, newEntry]);
+    addResearchEntry(newEntry); // Add the new entry to the global form data
+  };
+
   return (
     <div className="p-6 mx-auto sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-[1200px]">
       <div className="flex justify-end mb-6">
-        <Button onClick={addResearchEntry}>Add Research</Button>
+        <Button onClick={handleAddResearchEntry}>Add Research</Button>
       </div>
 
       {entries.map((entry, index) => (
@@ -73,16 +80,19 @@ export default function ResearchForm() {
           entry={entry}
           index={index}
           handleFileChange={handleFileChange}
+          updateFormData={updateFormData}
         />
       ))}
     </div>
   );
 }
 
-function ResearchEntryForm({ entry, index, handleFileChange }) {
+// Research Entry Form Component
+function ResearchEntryForm({ entry, index, handleFileChange, updateFormData }) {
   const [selectedResearchPaper, setSelectedResearchPaper] = useState(
     entry.researchPaper
   );
+  const [isSaved, setIsSaved] = useState(false); // State for save animation
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -93,11 +103,40 @@ function ResearchEntryForm({ entry, index, handleFileChange }) {
     },
   });
 
-  const onSubmit = (formData) => {
-    console.log(`Research Entry ${index + 1} Data:`, {
-      ...formData,
-      researchPaper: selectedResearchPaper,
+  // Update form values when entry changes
+  useEffect(() => {
+    form.reset({
+      title: entry.title,
+      abstract: entry.abstract,
+      researchPaper: entry.researchPaper,
     });
+    setSelectedResearchPaper(entry.researchPaper);
+  }, [entry, form]);
+
+  // Function to handle form submission
+  const onSubmit = (data) => {
+    const updatedEntry = {
+      ...data,
+      researchPaper: selectedResearchPaper,
+    };
+
+    // Update the specific research entry in the research array
+    updateFormData("research", (prevResearch) => {
+      const updatedResearch = [...prevResearch]; // Create a copy of the research array
+      updatedResearch[index] = updatedEntry; // Update the specific entry
+      return updatedResearch; // Return the updated array
+    });
+
+    console.log(`Research Entry ${index + 1} Data:`, updatedEntry);
+
+    // Show success feedback
+    setIsSaved(true);
+    toast.success("Research data saved successfully!");
+
+    // Reset the saved state after 3 seconds
+    setTimeout(() => {
+      setIsSaved(false);
+    }, 3000);
   };
 
   return (
@@ -108,7 +147,7 @@ function ResearchEntryForm({ entry, index, handleFileChange }) {
       >
         <h2 className="text-xl font-bold mb-4">Research Entry {index + 1}</h2>
 
-        {/* Title */}
+        {/* Title Field */}
         <FormField
           control={form.control}
           name="title"
@@ -126,7 +165,7 @@ function ResearchEntryForm({ entry, index, handleFileChange }) {
           )}
         />
 
-        {/* Abstract */}
+        {/* Abstract Field */}
         <FormField
           control={form.control}
           name="abstract"
@@ -148,7 +187,7 @@ function ResearchEntryForm({ entry, index, handleFileChange }) {
           )}
         />
 
-        {/* Research Paper Upload */}
+        {/* Research Paper Upload Field */}
         <FormField
           control={form.control}
           name="researchPaper"
@@ -175,9 +214,16 @@ function ResearchEntryForm({ entry, index, handleFileChange }) {
           )}
         />
 
-        <Button type="submit" className="w-full">
-          Save Research Data
-        </Button>
+        {/* Save Button and Success Feedback */}
+        <div className="flex items-center gap-2">
+          <Button type="submit">Save Research Data</Button>
+          {isSaved && (
+            <div className="flex items-center gap-1 text-green-600">
+              <CheckCircle className="h-4 w-4" />
+              <span>Saved!</span>
+            </div>
+          )}
+        </div>
       </form>
     </Form>
   );
