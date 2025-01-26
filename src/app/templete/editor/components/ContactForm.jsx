@@ -15,7 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react"; // For the green checkmark icon
 import { toast } from "react-hot-toast"; // For toast notifications
 
@@ -37,8 +37,8 @@ export function ContactForm({ data }) {
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      email: data?.email || contact?.email || "",
-      address: data?.address || contact?.address || "",
+      email: contact?.email || "",
+      address: contact?.address || "",
     },
   });
 

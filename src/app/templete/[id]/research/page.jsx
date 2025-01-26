@@ -4,10 +4,12 @@ import useTemplate from "@/hooks/useTemplate";
 import { useEffect } from "react";
 import ResearchCard from "../../component/researchCard";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/contexts/UserContext";
 
 const ResearchPage = () => {
   const { id } = useParams(); // Extract dynamic route parameter
   const { templateData, loading, error } = useTemplate(id); // Fetch template data
+  const { isAuthenticated } = useUser();
 
   // Safely access the blogs array
   const researchPapers = templateData?.details?.research || [];
@@ -15,14 +17,16 @@ const ResearchPage = () => {
 
   return (
     <div className="bg-white grid gap-y-20 mt-8 p-5">
-      <div className="flex justify-content-end ms-auto p-0">
-        <Button
-          size="lg"
-          onClick={() => router.push(`/templete/editor/?templateId=${id}`)}
-        >
-          Add Reseach Paper
-        </Button>
-      </div>
+      {isAuthenticated && (
+        <div className="flex justify-content-end ms-auto p-0">
+          <Button
+            size="lg"
+            onClick={() => router.push(`/templete/editor/?templateId=${id}`)}
+          >
+            Add Reseach Paper
+          </Button>
+        </div>
+      )}
       <div className="flex justify-center flex-col  gap-4 items-center text-blue-950">
         <div className="text-5xl font-bold">Research Papers</div>
         <div className="text-xl">Pick the one you love and read it</div>

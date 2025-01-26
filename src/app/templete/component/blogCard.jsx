@@ -15,9 +15,11 @@ import {
 } from "@/components/ui/dialog"; // Import shadcn/ui Dialog components
 import { Button } from "@/components/ui/button"; // Import shadcn/ui Button component
 import { usePathname } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
 
 const BlogCard = ({ data, templateId }) => {
   const pathname = usePathname();
+  const { isAuthenticated } = useUser();
 
   const blogId = data?.id;
   const dispatch = useDispatch();
@@ -55,13 +57,15 @@ const BlogCard = ({ data, templateId }) => {
             >
               <Eye className="w-5 h-5" />
             </Link>
-            <Link
-              href={`/templete/editor/?templateId=${templateId}`}
-              className="p-3 bg-green-600 text-white rounded-full hover:bg-green-500 transition-colors duration-300"
-              title="Update"
-            >
-              <Edit className="w-5 h-5" />
-            </Link>
+            {isAuthenticated && (
+              <Link
+                href={`/templete/editor/?templateId=${templateId}`}
+                className="p-3 bg-green-600 text-white rounded-full hover:bg-green-500 transition-colors duration-300"
+                title="Update"
+              >
+                <Edit className="w-5 h-5" />
+              </Link>
+            )}
 
             {/* Delete Button with Modal */}
             {/* <Dialog

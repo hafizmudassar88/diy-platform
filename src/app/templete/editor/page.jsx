@@ -19,7 +19,8 @@ function EditorContent() {
   const [templateId, setTemplateId] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
-  const { isTemplateEmpty, formData } = useFormContext();
+  const { isTemplateEmpty, formData, setFormDataApiData, resetFormData } =
+    useFormContext();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -38,6 +39,13 @@ function EditorContent() {
     { id: "blogs", label: "Blog" },
     { id: "research", label: "Research" },
   ];
+
+  useEffect(() => {
+    // Load template data when available
+    if (templateId && templateData?.details) {
+      setFormDataApiData(templateData.details);
+    }
+  }, [templateId, templateData?.details]); // Run when template data loads
 
   const renderForm = () => {
     switch (activeTab) {
@@ -65,16 +73,24 @@ function EditorContent() {
 
     try {
       let response;
-      if (templateData?._id) {
+      if (templateId) {
         const body = {
-          templateId: templateData?._id,
-          details: formData,
+          templateId: templateId,
+          details: {
+            home: formData.home,
+            about: formData.about,
+            contact: formData.contact,
+            blogs: formData.blogs,
+            research: formData.research,
+          },
         };
-        response = await axiosInstance.put("/template/update", { body });
+        response = await axiosInstance.put("/template/update", body);
+        resetFormData();
       } else {
         response = await axiosInstance.post("/template/create", {
           details: formData,
         });
+        resetFormData();
       }
 
       if (response.status !== 200) {
@@ -83,13 +99,12 @@ function EditorContent() {
       }
 
       toast.success(
-        `Template ${templateData?._id ? "updated" : "created"} successfully`
+        `Template ${templateId ? "updated" : "created"} successfully`
       );
-      router.push("/");
+      router.push("/templete");
     } catch (error) {
-      toast.error(
-        `Failed to ${templateData?._id ? "updated" : "create"} template`
-      );
+      console.log("creation/updation error: ", error);
+      toast.error(`Failed to ${templateId ? "updated" : "create"} template`);
     }
   };
 

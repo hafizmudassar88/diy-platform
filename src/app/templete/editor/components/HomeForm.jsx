@@ -49,30 +49,15 @@ export function HomeForm({ data }) {
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      logoImage: data?.logoImage || home?.logoImage || "",
-      name: data?.name || home?.name || "",
-      tagLine: data?.tagLine || home?.tagLine || "",
-      description: data?.description || home?.description || "",
-      heroSectionImage: data?.heroSectionImage || home?.heroSectionImage || "",
+      logoImage:  home?.logoImage || "",
+      name: home?.name || "",
+      tagLine: home?.tagLine || "",
+      description: home?.description || "",
+      heroSectionImage: home?.heroSectionImage || "",
     },
   });
 
   const { uploading, uploadFile } = useFileUpload();
-
-  // Update form values when `data` changes
-  useEffect(() => {
-    if (data) {
-      form.reset({
-        logoImage: data.logoImage || "",
-        name: data.name || "",
-        tagLine: data.tagLine || "",
-        description: data.description || "",
-        heroSectionImage: data.heroSectionImage || "",
-      });
-      setSelectedLogoImage(data.logoImage || null);
-      setSelectedHeroSectionImage(data.heroSectionImage || null);
-    }
-  }, [data, form]);
 
   // Handle file upload
   const handleFileChange = async (e, setFile) => {

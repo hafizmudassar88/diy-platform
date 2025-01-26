@@ -4,6 +4,8 @@ import { usePathname, useParams } from "next/navigation";
 import Link from "next/link";
 import ToggleButtonComponent from "./components/toggleButton";
 import Image from "next/image";
+import { useFormContext } from "@/contexts/FormContext";
+import useTemplate from "@/hooks/useTemplate";
 
 // Reusable NavLink Component
 const NavLink = ({ item, id }) => {
@@ -27,14 +29,16 @@ const NavLink = ({ item, id }) => {
 
 const NavbarTemplete = () => {
   const pathname = usePathname();
-  const params = useParams();
+  // const params = useParams();
   const [isOpen, setIsOpen] = useState(false);
+  // const id = params?.id || "default-id";
+  const { id } = useParams(); // Extract dynamic route parameter
+  const { templateData, loading, error } = useTemplate(id); // Fetch template data
+  const { logoImage } = templateData?.details?.home || {};
 
   const toggleMenu = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
-
-  const id = params?.id || "default-id";
 
   const navItems = [
     { name: "Home", url: `/templete/${id}` },
@@ -47,9 +51,9 @@ const NavbarTemplete = () => {
   return (
     <>
       {/* Desktop Navbar */}
-      <div className="hidden md:flex justify-around items-center h-16 bg-primaryLight z-30 text-black text-[16px]">
-        <div>
-          <Image src={'/images/logo.png'} alt="ShwraLogo" width={100} height={100} />
+      <div className="hidden pt-6 md:flex justify-around items-center h-16 bg-primaryLight z-30 text-black text-[16px]">
+        <div className="">
+          <Image src={logoImage} alt="ShwraLogo" width={100} height={100} />
         </div>
         <div className="flex gap-12">
           {navItems.map((item, index) => (

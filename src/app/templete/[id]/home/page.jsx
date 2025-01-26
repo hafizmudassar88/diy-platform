@@ -4,11 +4,9 @@ import Hero from "./components/Hero";
 import AboutPage from "../about/page";
 import ContactPage from "../contact/page";
 import BlogsPage from "../blogs/page";
+import ResearchPage from "../research/page";
 
 const TemplateHomePage = ({ data }) => {
-  useEffect(() => {
-    console.log("data details: ", data);
-  }, [data]);
 
   return (
     <div className="bg-white">
@@ -16,6 +14,7 @@ const TemplateHomePage = ({ data }) => {
       <AboutPage data={data} />
       <ContactPage data={data} />
       <BlogsPage data={data} />
+      {/* <ResearchPage data={data} /> */}
     </div>
   );
 };

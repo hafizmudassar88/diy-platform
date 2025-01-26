@@ -1,6 +1,21 @@
 "use client";
 import React, { createContext, useContext, useState, useCallback } from "react";
 
+// Initial form state
+const initialFormState = {
+  home: {
+    logoImage: "",
+    name: "",
+    tagLine: "",
+    description: "",
+    heroSectionImage: "",
+  },
+  about: { bioImage: "", title: "", bio: "" },
+  contact: { email: "", address: "" },
+  blogs: [],
+  research: [],
+};
+
 // Creating a context for form data
 const FormContext = createContext(undefined);
 
@@ -12,44 +27,39 @@ const isObjectEmpty = (obj) => {
 };
 
 export const FormProvider = ({ children }) => {
-  const [formData, setFormData] = useState({
-    home: {
-      logoImage: "",
-      name: "",
-      tagLine: "",
-      description: "",
-      heroSectionImage: "",
-    },
-    about: { bioImage: "", title: "", bio: "" },
-    contact: { email: "", address: "" },
-    blogs: [],
-    research: [],
-  });
+  const [formData, setFormData] = useState(initialFormState);
+
+  // Function to reset form data to initial state
+  const resetFormData = useCallback(() => {
+    setFormData(initialFormState);
+  }, []);
+
+  const setFormDataApiData = useCallback((apiData) => {
+    setFormData(apiData);
+  }, []);
 
   // Function to update specific form data
-  const updateFormData = useCallback((tab, dataOrUpdater) => {
+  const updateFormData = (tab, dataOrUpdater) => {
     setFormData((prev) => {
+      const currentTabData = prev[tab] || {};
       if (typeof dataOrUpdater === "function") {
-        // If a function is passed, use it to update the state
         return {
           ...prev,
-          [tab]: dataOrUpdater(prev[tab]),
-        };
-      } else {
-        // If an object is passed, merge it with the existing state
-        return {
-          ...prev,
-          [tab]: { ...prev[tab], ...dataOrUpdater },
+          [tab]: dataOrUpdater(currentTabData),
         };
       }
+      return {
+        ...prev,
+        [tab]: { ...currentTabData, ...dataOrUpdater },
+      };
     });
-  }, []);
+  };
 
   // Function to add a new blog entry
   const addBlogEntry = useCallback((newBlog) => {
     setFormData((prev) => ({
       ...prev,
-      blogs: [...(prev.blogs || []), newBlog], // Ensure blogs is always an array
+      blogs: [...(prev.blogs || []), newBlog],
     }));
   }, []);
 
@@ -57,11 +67,11 @@ export const FormProvider = ({ children }) => {
   const addResearchEntry = useCallback((newResearch) => {
     setFormData((prev) => ({
       ...prev,
-      research: [...(prev.research || []), newResearch], // Ensure research is always an array
+      research: [...(prev.research || []), newResearch],
     }));
   }, []);
 
-  // Check if the entire form (all pages) is empty
+  // Check if the entire form is empty
   const isTemplateEmpty = useCallback(() => {
     return isObjectEmpty(formData);
   }, [formData]);
@@ -69,7 +79,7 @@ export const FormProvider = ({ children }) => {
   // Check if a specific page is empty
   const isPageEmpty = useCallback(
     (page) => {
-      if (!formData[page]) return true; // If page doesn't exist, it's considered empty
+      if (!formData[page]) return true;
       return isObjectEmpty(formData[page]);
     },
     [formData]
@@ -84,6 +94,8 @@ export const FormProvider = ({ children }) => {
         addResearchEntry,
         isTemplateEmpty,
         isPageEmpty,
+        resetFormData, // Include reset function in context
+        setFormDataApiData,
       }}
     >
       {children}

@@ -44,9 +44,9 @@ export function AboutForm({ data }) {
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      bioImage: data?.bioImage || about?.bioImage || "",
-      title: data?.title || about?.title || "",
-      bio: data?.bio || about?.bio || "",
+      bioImage: about?.bioImage || "",
+      title: about?.title || "",
+      bio: about?.bio || "",
     },
   });
 

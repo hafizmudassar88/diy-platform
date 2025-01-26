@@ -10,6 +10,7 @@ import { useUser } from "../../../../contexts/UserContext";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import GoogleLoginButton from "@/components/core/GoogleLoginButton";
+import { setCookie } from "cookies-next";
 
 // Zod schema for form validation
 const loginSchema = z.object({
@@ -66,6 +67,7 @@ export default function Login() {
       toast.success("Logged in successfully");
 
       saveUserData(response?.data?.user, response?.data?.token);
+      setCookie("authToken", response?.data?.token); // Sync with middleware
 
       router.push("/");
     } catch (error) {

@@ -4,11 +4,13 @@ import BlogCard from "../../component/blogCard";
 import useTemplate from "@/hooks/useTemplate";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/contexts/UserContext";
 
 const BlogsPage = () => {
   const router = useRouter();
   const { id } = useParams(); // Extract dynamic route parameter
   const { templateData, loading, error } = useTemplate(id); // Fetch template data
+  const { isAuthenticated } = useUser();
 
   // Safely access the blogs array
   const blogs = templateData?.details?.blogs || [];
@@ -21,14 +23,16 @@ const BlogsPage = () => {
 
   return (
     <div className="bg-white grid gap-y-20 mt-8 p-5">
-      <div className="flex justify-content-end ms-auto">
-        <Button
-          size="lg"
-          onClick={() => router.push(`/templete/editor/?templateId=${id}`)}
-        >
-          Add Blog
-        </Button>
-      </div>
+      {isAuthenticated && (
+        <div className="flex justify-content-end ms-auto">
+          <Button
+            size="lg"
+            onClick={() => router.push(`/templete/editor/?templateId=${id}`)}
+          >
+            Add Blog
+          </Button>
+        </div>
+      )}
 
       <div className="flex justify-center flex-col  gap-4 items-center text-blue-950">
         <div className="text-5xl font-bold">Blogs</div>

@@ -60,7 +60,7 @@ export default function ResearchDetailPage() {
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
               <span className="text-sm">
-                {numPages ? `${numPages} pages` : 'Loading...'}
+                {numPages ? `${numPages} pages` : '5 mins'}
               </span>
             </div>
           </div>
@@ -79,6 +79,7 @@ export default function ResearchDetailPage() {
               <h3 className="text-lg font-semibold">Research Paper</h3>
               <a
                 href={research.researchPaper}
+                target="_blank"
                 download
                 className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
               >
@@ -87,7 +88,7 @@ export default function ResearchDetailPage() {
               </a>
             </div>
             
-            <div className="bg-gray-100 p-4">
+            {/* <div className="bg-gray-100 p-4">
               <Document
                 file={research.researchPaper}
                 onLoadSuccess={onDocumentLoadSuccess}
@@ -103,7 +104,7 @@ export default function ResearchDetailPage() {
                   />
                 ))}
               </Document>
-            </div>
+            </div> */}
           </div>
         </div>
       </article>
