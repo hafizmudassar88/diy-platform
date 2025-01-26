@@ -70,9 +70,11 @@ function EditorContent() {
           templateId: templateData?._id,
           details: formData,
         };
-        response = await axiosInstance.put("/template/update", body);
+        response = await axiosInstance.put("/template/update", { body });
       } else {
-        response = await axiosInstance.post("/template/create", formData);
+        response = await axiosInstance.post("/template/create", {
+          details: formData,
+        });
       }
 
       if (response.status !== 200) {

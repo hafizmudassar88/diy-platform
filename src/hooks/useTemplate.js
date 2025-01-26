@@ -49,10 +49,10 @@ const useTemplate = (templateId) => {
           setTemplateData(fetchedTemplateData);
 
           // Cache the data in localStorage for future use
-          localStorage.setItem(
-            `template-${templateId}`,
-            JSON.stringify(fetchedTemplateData)
-          );
+          // localStorage.setItem(
+          //   `template-${templateId}`,
+          //   JSON.stringify(fetchedTemplateData)
+          // );
         } else {
           setError("Template not found.");
         }

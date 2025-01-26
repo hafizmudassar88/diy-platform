@@ -17,10 +17,9 @@ import {
 } from "@/components/ui/form";
 import useFileUpload from "@/hooks/useFileUpload";
 import { useFormContext } from "@/contexts/FormContext";
-import { CheckCircle } from "lucide-react"; // For the green checkmark icon
-import { toast } from "react-hot-toast"; // For toast notifications
+import { CheckCircle, AlertCircle } from "lucide-react";
+import { toast } from "react-hot-toast";
 
-// Define the schema for the blog form
 const schema = z.object({
   tagline: z.string().min(1, "Tagline is required"),
   description: z.string().min(1, "Description is required"),
@@ -29,71 +28,153 @@ const schema = z.object({
 
 export default function BlogForm() {
   const { formData, addBlogEntry, updateFormData } = useFormContext();
-  const { blogs } = formData; // Pull blogs from global formData
-
-  // Initialize entries as an array, even if blogs is undefined
-  const [entries, setEntries] = useState(Array.isArray(blogs) ? blogs : []);
-
-  // Sync entries with formData.blogs whenever it changes
-  useEffect(() => {
-    if (Array.isArray(blogs)) {
-      setEntries(blogs);
-    }
-
-    console.log(`form Data:`, formData);
-  }, [blogs]);
+  const { blogs } = formData;
+  const [entries, setEntries] = useState(() => 
+    Array.isArray(blogs) 
+      ? blogs.map(entry => ({ ...entry, isDirty: false })) 
+      : []
+  );
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { uploadFile } = useFileUpload();
 
-  // Function to handle file upload
+  const filteredEntries = entries.filter(entry => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      entry.id.toString().includes(searchLower) ||
+      entry.tagline.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const allSaved = entries.every(entry => !entry.isDirty);
+  const unsavedCount = entries.filter(entry => entry.isDirty).length;
+
+  useEffect(() => {
+    if (Array.isArray(blogs)) {
+      setEntries(blogs.map(entry => ({ 
+        ...entry, 
+        isDirty: false 
+      })));
+    }
+  }, [blogs]);
+
   const handleFileChange = async (e, setFileCallback) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
     try {
-      const uploadedUrl = await uploadFile(selectedFile); // Upload the file
-      setFileCallback(uploadedUrl); // Update the state with the uploaded file URL
+      const uploadedUrl = await uploadFile(selectedFile);
+      setFileCallback(uploadedUrl);
     } catch (error) {
       console.error("File upload failed:", error.message);
     }
   };
 
-  // Function to add a new blog entry
   const handleAddBlogEntry = () => {
     const newEntry = {
-      id: entries.length + 1,
+      id: Date.now(),
       tagline: "",
       description: "",
       heroImage: "",
+      isDirty: true
     };
     setEntries([...entries, newEntry]);
-    addBlogEntry(newEntry); // Add the new entry to the global form data
+    addBlogEntry(newEntry);
+  };
+
+  const handleRemoveBlogEntry = (idToRemove) => {
+    updateFormData("blogs", prevBlogs => 
+      prevBlogs.filter(blog => blog.id !== idToRemove)
+    );
+    setEntries(prev => prev.filter(entry => entry.id !== idToRemove));
+  };
+
+  const handleEntryUpdate = (id, updatedData) => {
+    setEntries(prevEntries =>
+      prevEntries.map(entry =>
+        entry.id === id ? { ...updatedData, isDirty: true } : entry
+      )
+    );
+  };
+
+  const handleEntrySave = async (id) => {
+    try {
+      const entryToSave = entries.find(entry => entry.id === id);
+      
+      const validation = schema.safeParse({
+        tagline: entryToSave.tagline,
+        description: entryToSave.description,
+        heroImage: entryToSave.heroImage
+      });
+
+      if (!validation.success) {
+        const errors = validation.error.errors.map(err => `${err.path[0]} ${err.message}`);
+        throw new Error(`Validation errors: ${errors.join(", ")}`);
+      }
+
+      updateFormData("blogs", prevBlogs =>
+        prevBlogs.map(blog =>
+          blog.id === id ? { ...entryToSave, isDirty: false } : blog
+        )
+      );
+
+      setEntries(prevEntries =>
+        prevEntries.map(entry =>
+          entry.id === id ? { ...entry, isDirty: false } : entry
+        )
+      );
+
+      toast.success("Blog entry saved successfully!");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
     <div className="p-6 mx-auto sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-[1200px]">
-      <div className="flex justify-end mb-6">
-        <Button onClick={handleAddBlogEntry}>Add Blog</Button>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <Button onClick={handleAddBlogEntry}>Add Blog</Button>
+          <div className="text-sm text-muted-foreground">
+            {allSaved ? (
+              <span className="text-green-600 flex items-center gap-1">
+                <CheckCircle className="h-4 w-4" />
+                All changes saved
+              </span>
+            ) : (
+              <span className="text-yellow-600 flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {unsavedCount} unsaved {unsavedCount === 1 ? "entry" : "entries"}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="w-full sm:flex-1 sm:max-w-xs">
+          <Input
+            type="text"
+            placeholder="Search by ID or tagline..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full"
+          />
+        </div>
       </div>
 
-      {entries.map((entry, index) => (
+      {filteredEntries.map((entry) => (
         <BlogEntryForm
           key={entry.id}
           entry={entry}
-          index={index}
           handleFileChange={handleFileChange}
-          updateFormData={updateFormData}
+          onUpdate={handleEntryUpdate}
+          onSave={handleEntrySave}
+          onRemove={handleRemoveBlogEntry}
         />
       ))}
     </div>
   );
 }
 
-// Blog Entry Form Component
-function BlogEntryForm({ entry, index, handleFileChange, updateFormData }) {
-  const [selectedHeroImage, setSelectedHeroImage] = useState(entry.heroImage);
-  const [isSaved, setIsSaved] = useState(false); // State for save animation
-
+function BlogEntryForm({ entry, handleFileChange, onUpdate, onSave, onRemove }) {
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -103,51 +184,66 @@ function BlogEntryForm({ entry, index, handleFileChange, updateFormData }) {
     },
   });
 
-  // Update form values when entry changes
-  useEffect(() => {
-    form.reset({
-      tagline: entry.tagline,
-      description: entry.description,
-      heroImage: entry.heroImage,
+  const handleChange = (field, value) => {
+    form.setValue(field, value, { shouldValidate: true });
+    onUpdate(entry.id, {
+      ...entry,
+      [field]: value,
     });
-    setSelectedHeroImage(entry.heroImage);
-  }, [entry, form]);
+  };
 
-  // Function to handle form submission
-  const onSubmit = (data) => {
-    const updatedEntry = {
-      ...data,
-      heroImage: selectedHeroImage,
-    };
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    // Update the specific blog entry in the blogs array
-    updateFormData("blogs", (prevBlogs) => {
-      const updatedBlogs = [...prevBlogs]; // Create a copy of the blogs array
-      updatedBlogs[index] = updatedEntry; // Update the specific entry
-      return updatedBlogs; // Return the updated array
-    });
-
-    console.log(`Blog Entry ${index + 1} Data:`, updatedEntry);
-
-    // Show success feedback
-    setIsSaved(true);
-    toast.success("Blog data saved successfully!");
-
-    // Reset the saved state after 3 seconds
-    setTimeout(() => {
-      setIsSaved(false);
-    }, 3000);
+    try {
+      await handleFileChange(e, (url) => {
+        handleChange('heroImage', url);
+        form.setValue('heroImage', url, { shouldValidate: true });
+      });
+    } catch (error) {
+      toast.error("Image upload failed. Please try again.");
+    }
   };
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 p-6 border rounded-lg"
-      >
-        <h2 className="text-xl font-bold mb-4">Blog Entry {index + 1}</h2>
+      <div className="space-y-6 p-6 border rounded-lg mb-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-xl font-bold">Blog Entry ID: {entry.id}</h2>
+            <div className="text-sm mt-1 flex items-center gap-1">
+              {entry.isDirty ? (
+                <span className="text-yellow-600">
+                  <AlertCircle className="h-4 w-4 inline mr-1" />
+                  Unsaved changes
+                </span>
+              ) : (
+                <span className="text-green-600">
+                  <CheckCircle className="h-4 w-4 inline mr-1" />
+                  Saved
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              onClick={() => onSave(entry.id)}
+              disabled={!entry.isDirty}
+            >
+              Save Entry
+            </Button>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => onRemove(entry.id)}
+            >
+              Remove
+            </Button>
+          </div>
+        </div>
 
-        {/* Tagline Field */}
         <FormField
           control={form.control}
           name="tagline"
@@ -155,17 +251,17 @@ function BlogEntryForm({ entry, index, handleFileChange, updateFormData }) {
             <FormItem>
               <FormLabel>Tagline</FormLabel>
               <FormControl>
-                <Input placeholder="Enter tagline" {...field} />
+                <Input 
+                  placeholder="Enter tagline" 
+                  {...field}
+                  onChange={(e) => handleChange('tagline', e.target.value)}
+                />
               </FormControl>
-              <FormDescription>
-                Required: Enter a catchy tagline for the blog
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Description Field */}
         <FormField
           control={form.control}
           name="description"
@@ -173,17 +269,18 @@ function BlogEntryForm({ entry, index, handleFileChange, updateFormData }) {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Enter description" rows={4} {...field} />
+                <Textarea
+                  placeholder="Enter description"
+                  rows={4}
+                  {...field}
+                  onChange={(e) => handleChange('description', e.target.value)}
+                />
               </FormControl>
-              <FormDescription>
-                Required: Provide a brief description
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Hero Image Field */}
         <FormField
           control={form.control}
           name="heroImage"
@@ -194,32 +291,23 @@ function BlogEntryForm({ entry, index, handleFileChange, updateFormData }) {
                 <Input
                   type="file"
                   accept="image/*"
-                  placeholder="Upload hero section image"
-                  onChange={(e) => {
-                    field.onChange(e);
-                    handleFileChange(e, setSelectedHeroImage);
-                  }}
+                  onChange={handleFileUpload}
                 />
               </FormControl>
               <FormDescription>
-                {selectedHeroImage || "Required: Choose your hero section image"}
+                {field.value ? (
+                  <span className="text-green-600 break-all">
+                    Uploaded: {field.value}
+                  </span>
+                ) : (
+                  "Required: Choose your hero section image"
+                )}
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {/* Save Button and Success Feedback */}
-        <div className="flex items-center gap-2">
-          <Button type="submit">Save Blog Data</Button>
-          {isSaved && (
-            <div className="flex items-center gap-1 text-green-600">
-              <CheckCircle className="h-4 w-4" />
-              <span>Saved!</span>
-            </div>
-          )}
-        </div>
-      </form>
+      </div>
     </Form>
   );
 }

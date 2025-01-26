@@ -17,10 +17,9 @@ import {
 } from "@/components/ui/form";
 import useFileUpload from "@/hooks/useFileUpload";
 import { useFormContext } from "@/contexts/FormContext";
-import { CheckCircle } from "lucide-react"; // For the green checkmark icon
-import { toast } from "react-hot-toast"; // For toast notifications
+import { CheckCircle, AlertCircle } from "lucide-react";
+import { toast } from "react-hot-toast";
 
-// Define the schema for the research form
 const schema = z.object({
   title: z.string().min(1, "Title is required"),
   abstract: z.string().min(1, "Abstract is required"),
@@ -29,71 +28,159 @@ const schema = z.object({
 
 export default function ResearchForm() {
   const { formData, addResearchEntry, updateFormData } = useFormContext();
-  const { research } = formData; // Pull research from global formData
-
-  // Initialize entries as an array, even if research is undefined
-  const [entries, setEntries] = useState(Array.isArray(research) ? research : []);
-
-  // Sync entries with formData.research whenever it changes
-  useEffect(() => {
-    if (Array.isArray(research)) {
-      setEntries(research);
-    }
-  }, [research]);
+  const { research } = formData;
+  const [entries, setEntries] = useState(() => 
+    Array.isArray(research) 
+      ? research.map(entry => ({ ...entry, isDirty: false })) 
+      : []
+  );
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { uploadFile } = useFileUpload();
 
-  // Function to handle file upload
+  const filteredEntries = entries.filter(entry => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      entry.id.toString().includes(searchLower) ||
+      entry.title.toLowerCase().includes(searchLower)
+    );
+  });
+
+  const allSaved = entries.every(entry => !entry.isDirty);
+  const unsavedCount = entries.filter(entry => entry.isDirty).length;
+
+  useEffect(() => {
+    if (Array.isArray(research)) {
+      setEntries(research.map(entry => ({ 
+        ...entry, 
+        isDirty: false 
+      })));
+    }
+  }, [research]);
+
   const handleFileChange = async (e, setFileCallback) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
 
     try {
-      const uploadedUrl = await uploadFile(selectedFile); // Upload the file
-      setFileCallback(uploadedUrl); // Update the state with the uploaded file URL
+      const uploadedUrl = await uploadFile(selectedFile);
+      setFileCallback(uploadedUrl);
+      return uploadedUrl;
     } catch (error) {
       console.error("File upload failed:", error.message);
+      throw error;
     }
   };
 
-  // Function to add a new research entry
   const handleAddResearchEntry = () => {
     const newEntry = {
-      id: entries.length + 1,
+      id: Date.now(),
       title: "",
       abstract: "",
       researchPaper: "",
+      isDirty: true
     };
     setEntries([...entries, newEntry]);
-    addResearchEntry(newEntry); // Add the new entry to the global form data
+    addResearchEntry(newEntry);
+  };
+
+  const handleRemoveResearchEntry = (idToRemove) => {
+    updateFormData("research", prevResearch => 
+      prevResearch.filter(entry => entry.id !== idToRemove)
+    );
+    setEntries(prev => prev.filter(entry => entry.id !== idToRemove));
+  };
+
+  const handleEntryUpdate = (id, updatedData) => {
+    setEntries(prevEntries =>
+      prevEntries.map(entry =>
+        entry.id === id ? { ...updatedData, isDirty: true } : entry
+      )
+    );
+  };
+
+  const handleEntrySave = async (id) => {
+    try {
+      const entryIndex = entries.findIndex(entry => entry.id === id);
+      const entryToSave = entries[entryIndex];
+      
+      // Validate using current entry data
+      const validation = schema.safeParse({
+        title: entryToSave.title,
+        abstract: entryToSave.abstract,
+        researchPaper: entryToSave.researchPaper
+      });
+
+      if (!validation.success) {
+        const errors = validation.error.errors.map(err => `${err.path[0]} ${err.message}`);
+        throw new Error(`Validation failed: ${errors.join(", ")}`);
+      }
+
+      // Update global form state
+      updateFormData("research", prevResearch =>
+        prevResearch.map(entry =>
+          entry.id === id ? { ...entryToSave, isDirty: false } : entry
+        )
+      );
+
+      // Update local entries state
+      setEntries(prevEntries =>
+        prevEntries.map(entry =>
+          entry.id === id ? { ...entry, isDirty: false } : entry
+        )
+      );
+
+      toast.success("Research entry saved successfully!");
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
     <div className="p-6 mx-auto sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-[1200px]">
-      <div className="flex justify-end mb-6">
-        <Button onClick={handleAddResearchEntry}>Add Research</Button>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <Button onClick={handleAddResearchEntry}>Add Research</Button>
+          <div className="text-sm text-muted-foreground">
+            {allSaved ? (
+              <span className="text-green-600 flex items-center gap-1">
+                <CheckCircle className="h-4 w-4" />
+                All changes saved
+              </span>
+            ) : (
+              <span className="text-yellow-600 flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {unsavedCount} unsaved {unsavedCount === 1 ? "entry" : "entries"}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="w-full sm:flex-1 sm:max-w-xs">
+          <Input
+            type="text"
+            placeholder="Search by ID or title..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full"
+          />
+        </div>
       </div>
 
-      {entries.map((entry, index) => (
+      {filteredEntries.map((entry) => (
         <ResearchEntryForm
           key={entry.id}
           entry={entry}
-          index={index}
           handleFileChange={handleFileChange}
-          updateFormData={updateFormData}
+          onUpdate={handleEntryUpdate}
+          onSave={handleEntrySave}
+          onRemove={handleRemoveResearchEntry}
         />
       ))}
     </div>
   );
 }
 
-// Research Entry Form Component
-function ResearchEntryForm({ entry, index, handleFileChange, updateFormData }) {
-  const [selectedResearchPaper, setSelectedResearchPaper] = useState(
-    entry.researchPaper
-  );
-  const [isSaved, setIsSaved] = useState(false); // State for save animation
-
+function ResearchEntryForm({ entry, handleFileChange, onUpdate, onSave, onRemove }) {
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -103,51 +190,71 @@ function ResearchEntryForm({ entry, index, handleFileChange, updateFormData }) {
     },
   });
 
-  // Update form values when entry changes
-  useEffect(() => {
-    form.reset({
-      title: entry.title,
-      abstract: entry.abstract,
-      researchPaper: entry.researchPaper,
+  const handleChange = (field, value) => {
+    form.setValue(field, value, { shouldValidate: true });
+    onUpdate(entry.id, {
+      ...entry,
+      [field]: value,
     });
-    setSelectedResearchPaper(entry.researchPaper);
-  }, [entry, form]);
+  };
 
-  // Function to handle form submission
-  const onSubmit = (data) => {
-    const updatedEntry = {
-      ...data,
-      researchPaper: selectedResearchPaper,
-    };
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    // Update the specific research entry in the research array
-    updateFormData("research", (prevResearch) => {
-      const updatedResearch = [...prevResearch]; // Create a copy of the research array
-      updatedResearch[index] = updatedEntry; // Update the specific entry
-      return updatedResearch; // Return the updated array
-    });
+    try {
+      const uploadedUrl = await handleFileChange(e, (url) => {
+        handleChange('researchPaper', url);
+        form.setValue('researchPaper', url, { shouldValidate: true });
+      });
+      
+      // Force validation after successful upload
+      form.trigger('researchPaper');
+      handleChange('researchPaper', uploadedUrl);
 
-    console.log(`Research Entry ${index + 1} Data:`, updatedEntry);
-
-    // Show success feedback
-    setIsSaved(true);
-    toast.success("Research data saved successfully!");
-
-    // Reset the saved state after 3 seconds
-    setTimeout(() => {
-      setIsSaved(false);
-    }, 3000);
+    } catch (error) {
+      toast.error("File upload failed. Please try again.");
+    }
   };
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 p-6 border rounded-lg"
-      >
-        <h2 className="text-xl font-bold mb-4">Research Entry {index + 1}</h2>
+      <div className="space-y-6 p-6 border rounded-lg mb-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h2 className="text-xl font-bold">Research Entry ID: {entry.id}</h2>
+            <div className="text-sm mt-1 flex items-center gap-1">
+              {entry.isDirty ? (
+                <span className="text-yellow-600">
+                  <AlertCircle className="h-4 w-4 inline mr-1" />
+                  Unsaved changes
+                </span>
+              ) : (
+                <span className="text-green-600">
+                  <CheckCircle className="h-4 w-4 inline mr-1" />
+                  Saved
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              onClick={() => onSave(entry.id)}
+              disabled={!entry.isDirty}
+            >
+              Save Entry
+            </Button>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => onRemove(entry.id)}
+            >
+              Remove
+            </Button>
+          </div>
+        </div>
 
-        {/* Title Field */}
         <FormField
           control={form.control}
           name="title"
@@ -155,17 +262,17 @@ function ResearchEntryForm({ entry, index, handleFileChange, updateFormData }) {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Enter research title" {...field} />
+                <Input 
+                  placeholder="Enter research title" 
+                  {...field}
+                  onChange={(e) => handleChange('title', e.target.value)}
+                />
               </FormControl>
-              <FormDescription>
-                Required: Provide a title for your research
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Abstract Field */}
         <FormField
           control={form.control}
           name="abstract"
@@ -177,17 +284,14 @@ function ResearchEntryForm({ entry, index, handleFileChange, updateFormData }) {
                   placeholder="Enter research abstract"
                   rows={4}
                   {...field}
+                  onChange={(e) => handleChange('abstract', e.target.value)}
                 />
               </FormControl>
-              <FormDescription>
-                Required: Provide a brief abstract of your research
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Research Paper Upload Field */}
         <FormField
           control={form.control}
           name="researchPaper"
@@ -198,33 +302,23 @@ function ResearchEntryForm({ entry, index, handleFileChange, updateFormData }) {
                 <Input
                   type="file"
                   accept="application/pdf"
-                  placeholder="Upload research paper"
-                  onChange={(e) => {
-                    field.onChange(e);
-                    handleFileChange(e, setSelectedResearchPaper);
-                  }}
+                  onChange={handleFileUpload}
                 />
               </FormControl>
               <FormDescription>
-                {selectedResearchPaper ||
-                  "Required: Upload your research paper as a PDF"}
+                {field.value ? (
+                  <span className="text-green-600 break-all">
+                    Uploaded: {field.value}
+                  </span>
+                ) : (
+                  "Required: Upload your research paper as a PDF"
+                )}
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {/* Save Button and Success Feedback */}
-        <div className="flex items-center gap-2">
-          <Button type="submit">Save Research Data</Button>
-          {isSaved && (
-            <div className="flex items-center gap-1 text-green-600">
-              <CheckCircle className="h-4 w-4" />
-              <span>Saved!</span>
-            </div>
-          )}
-        </div>
-      </form>
+      </div>
     </Form>
   );
 }
