@@ -15,10 +15,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
 import { useState, useEffect } from "react";
 import useFileUpload from "@/hooks/useFileUpload";
 import { CheckCircle } from "lucide-react"; // For the green checkmark icon
 import { toast } from "react-hot-toast"; // For toast notifications
+import Toggle from "../../component/Toggle";
 
 // Zod schema for form validation
 const schema = z.object({
@@ -41,6 +43,7 @@ export function HomeForm({ data }) {
   const [selectedHeroSectionImage, setSelectedHeroSectionImage] = useState(
     data?.heroSectionImage || null
   );
+  const [isHidden, setIsHidden] = useState(home?.showInPublished ?? false);
 
   // State to track if the form is saved
   const [isSaved, setIsSaved] = useState(false);
@@ -49,11 +52,12 @@ export function HomeForm({ data }) {
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      logoImage:  home?.logoImage || "",
+      logoImage: home?.logoImage || "",
       name: home?.name || "",
       tagLine: home?.tagLine || "",
       description: home?.description || "",
       heroSectionImage: home?.heroSectionImage || "",
+      showInPublished: home?.showInPublished ?? false, // Ensure it exists
     },
   });
 
@@ -82,16 +86,19 @@ export function HomeForm({ data }) {
       ...formData,
       logoImage: selectedLogoImage,
       heroSectionImage: selectedHeroSectionImage,
+      showInPublished: isHidden, // Ensure it is sent
+    });
+
+    console.log("Final home data sent to backend:", {
+      ...formData,
+      logoImage: selectedLogoImage,
+      heroSectionImage: selectedHeroSectionImage,
+      showInPublished: isHidden,
     });
 
     // Show success feedback
     setIsSaved(true);
     toast.success("Home data saved successfully!");
-
-    // Reset the saved state after 3 seconds
-    setTimeout(() => {
-      setIsSaved(false);
-    }, 3000);
   };
 
   // Handlers for file input changes
@@ -102,11 +109,23 @@ export function HomeForm({ data }) {
   const handleSelectedHeroSectionImageChange = async (e) => {
     await handleFileChange(e, setSelectedHeroSectionImage);
   };
+  const handleToggleChange = (value) => {
+    setIsHidden(value);
+    updateFormData("home", { ...home, showInPublished: value });
+    form.setValue("showInPublished", value);
+  };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         {/* Logo Image */}
+        {/* Toggle to Hide Page */}
+        <Toggle
+          checked={isHidden}
+          onChange={handleToggleChange}
+          label="Hide Page"
+        />
+
         <FormField
           control={form.control}
           name="logoImage"
@@ -125,7 +144,9 @@ export function HomeForm({ data }) {
                 />
               </FormControl>
               <FormDescription>
-                {selectedLogoImage || home?.logoImage || "Required: Choose your logo image"}
+                {selectedLogoImage ||
+                  home?.logoImage ||
+                  "Required: Choose your logo image"}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -205,7 +226,8 @@ export function HomeForm({ data }) {
                 />
               </FormControl>
               <FormDescription>
-                {selectedHeroSectionImage || home?.heroSectionImage ||
+                {selectedHeroSectionImage ||
+                  home?.heroSectionImage ||
                   "Required: Choose your hero section image"}
               </FormDescription>
               <FormMessage />

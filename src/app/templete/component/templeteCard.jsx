@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 
 const TemplateCard = ({ data }) => {
-  const template = data
+  const template = data;
 
   return (
     <div className="flex justify-center items-center bg-gray-100 rounded-xl ring-2 ring-[#1B94A6] shadow-xl">
@@ -24,12 +24,14 @@ const TemplateCard = ({ data }) => {
           <div className="flex gap-4">
             <Link
               href="/templete/templeteOne"
+              target="_blank"
               className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-500"
             >
               Preview
             </Link>
             <Link
               href="/templete/editor"
+              target="_blank"
               className="px-4 py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-500"
             >
               Choose

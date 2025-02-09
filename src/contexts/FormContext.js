@@ -9,6 +9,7 @@ const initialFormState = {
     tagLine: "",
     description: "",
     heroSectionImage: "",
+    showInPublished: false, // Default OFF
   },
   about: { bioImage: "", title: "", bio: "" },
   contact: { email: "", address: "" },
@@ -35,22 +36,42 @@ export const FormProvider = ({ children }) => {
   }, []);
 
   const setFormDataApiData = useCallback((apiData) => {
-    setFormData(apiData);
+    setFormData((prev) => ({
+      ...prev,
+      home: {
+        ...apiData.home,
+        showInPublished: apiData.home?.showInPublished ?? false,
+      },
+      about: {
+        ...apiData.about,
+        showInPublished: apiData.about?.showInPublished ?? false,
+      },
+      contact: {
+        ...apiData.contact,
+        showInPublished: apiData.contact?.showInPublished ?? false,
+      },
+      blogs: apiData.blogs || [],
+      research: apiData.research || [],
+    }));
   }, []);
 
   // Function to update specific form data
   const updateFormData = (tab, dataOrUpdater) => {
     setFormData((prev) => {
       const currentTabData = prev[tab] || {};
-      if (typeof dataOrUpdater === "function") {
-        return {
-          ...prev,
-          [tab]: dataOrUpdater(currentTabData),
-        };
+      let newData =
+        typeof dataOrUpdater === "function"
+          ? dataOrUpdater(currentTabData)
+          : { ...currentTabData, ...dataOrUpdater };
+
+      // Ensure showInPublished is always a boolean
+      if (typeof newData.showInPublished === "undefined") {
+        newData.showInPublished = false; // Default OFF
       }
+
       return {
         ...prev,
-        [tab]: { ...currentTabData, ...dataOrUpdater },
+        [tab]: newData,
       };
     });
   };

@@ -9,7 +9,8 @@ import { useUser } from "@/contexts/UserContext";
 
 // Sample JSON data
 const editableTemplate = {
-  logoImage: "/images/bannerImage.png",
+  logoImage:
+    "https://png.pngtree.com/png-clipart/20190521/ourmid/pngtree-knowledge-network-trees-elements-of-studentseducational-thinking-back-to-school-png-image_1042961.jpg",
   name: "Template Title",
   description: "This is a template description",
 };

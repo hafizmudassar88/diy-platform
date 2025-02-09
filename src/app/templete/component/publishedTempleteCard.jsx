@@ -24,7 +24,7 @@ const PublishedTemplateCard = ({ data }) => {
   const handleDelete = () => {
     dispatch(removeTemplateData(templateId)).then(() => {
       dispatch(getTemplateData());
-      setIsDeleteModalOpen(false); // Close the modal after deletion
+      setIsDeleteModalOpen(false);
     });
   };
 
@@ -49,12 +49,14 @@ const PublishedTemplateCard = ({ data }) => {
             <Link
               href={`/templete/${data?._id}`}
               className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition-colors duration-300"
+              target="_blank"
               title="View"
             >
               <Eye className="w-5 h-5" />
             </Link>
             <Link
               href={`/templete/editor/?templateId=${templateId}`}
+              target="_blank"
               className="p-3 bg-green-600 text-white rounded-full hover:bg-green-500 transition-colors duration-300"
               title="Update"
             >
