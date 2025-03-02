@@ -9,7 +9,7 @@ const Hero = ({ data }) => {
   } = data?.details?.home || {};
 
   return (
-    <div className="flex md:flex-row flex-col w-full md:py-32 bg-primaryLight">
+    <div className="flex md:flex-row flex-col w-full md:py-32 bg-white">
       {/* Text Section */}
       <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left md:w-1/2 lg:ms-32 md:ms-8 px-4 md:px-0">
         <h1 className="text-5xl font-bold text-[#1B94A6] capitalize">

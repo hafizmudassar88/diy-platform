@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { removeTemplateData, getTemplateData } from "@/redux/templateSlice";
-import { Eye, Edit, Trash2 } from "lucide-react"; // Import Lucide icons
+import { Eye, Edit, Trash2 } from "lucide-react"; // Lucide icons
 import {
   Dialog,
   DialogTrigger,
@@ -12,10 +12,10 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-} from "@/components/ui/dialog"; // Import shadcn/ui Dialog components
-import { Button } from "@/components/ui/button"; // Import shadcn/ui Button component
+} from "@/components/ui/dialog"; // shadcn/ui Dialog components
+import { Button } from "@/components/ui/button"; // shadcn/ui Button component
 
-const PublishedTemplateCard = ({ data }) => {
+const PublishedTemplateCard = ({ data, user }) => {
   const template = data?.details?.home;
   const templateId = data?._id;
   const dispatch = useDispatch();
@@ -28,9 +28,24 @@ const PublishedTemplateCard = ({ data }) => {
     });
   };
 
+  // Define status styles for better visibility
+  const statusClasses = {
+    PENDING:
+      "bg-[#1B94A6] text-white text-lg font-bold px-4 py-2 rounded-lg shadow-md",
+    APPROVED:
+      "bg-green-600 text-white text-lg font-bold px-4 py-2 rounded-lg shadow-md",
+    CANCELLED:
+      "bg-red-500 text-white text-lg font-bold px-4 py-2 rounded-lg shadow-md",
+  };
+
   return (
     <div className="flex justify-center items-center bg-gray-100 rounded-xl ring-2 ring-[#1B94A6] shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <div className="relative w-64 h-80 overflow-hidden rounded-lg shadow-lg group">
+        {/* Status Badge (Prominent) */}
+        <div className={`absolute top-2 left-2 ${statusClasses[data?.status]}`}>
+          {data?.status}
+        </div>
+
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-center transition-opacity duration-300 group-hover:opacity-60 bg-contain bg-no-repeat"

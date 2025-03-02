@@ -109,22 +109,22 @@ export function HomeForm({ data }) {
   const handleSelectedHeroSectionImageChange = async (e) => {
     await handleFileChange(e, setSelectedHeroSectionImage);
   };
-  const handleToggleChange = (value) => {
-    setIsHidden(value);
-    updateFormData("home", { ...home, showInPublished: value });
-    form.setValue("showInPublished", value);
-  };
+  // const handleToggleChange = (value) => {
+  //   setIsHidden(value);
+  //   updateFormData("home", { ...home, showInPublished: value });
+  //   form.setValue("showInPublished", value);
+  // };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         {/* Logo Image */}
         {/* Toggle to Hide Page */}
-        <Toggle
+        {/* <Toggle
           checked={isHidden}
           onChange={handleToggleChange}
           label="Hide Page"
-        />
+        /> */}
 
         <FormField
           control={form.control}

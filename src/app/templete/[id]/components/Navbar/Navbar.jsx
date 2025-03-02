@@ -51,7 +51,7 @@ const NavbarTemplete = () => {
   return (
     <>
       {/* Desktop Navbar */}
-      <div className="hidden pt-6 md:flex justify-around items-center h-16 bg-primaryLight z-30 text-black text-[16px]">
+      <div className="hidden pt-6 md:flex justify-around items-center h-16 bg-white z-30 text-black text-[16px]">
         <div className="">
           <Image src={logoImage} alt="ShwraLogo" width={100} height={100} />
         </div>
