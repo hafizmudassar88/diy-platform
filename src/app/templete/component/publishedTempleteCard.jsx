@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button"; // shadcn/ui Button component
 const PublishedTemplateCard = ({ data, user }) => {
   const template = data?.details?.home;
   const templateId = data?._id;
+  const isResumeTemplate = Boolean(data?.details?.resume);
   const dispatch = useDispatch();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -62,7 +63,11 @@ const PublishedTemplateCard = ({ data, user }) => {
           </p>
           <div className="flex gap-4">
             <Link
-              href={`/templete/${data?._id}`}
+              href={
+                !isResumeTemplate
+                  ? `/templete/${data?._id}`
+                  : `/resume-template/preview?id=${data?._id}`
+              }
               className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition-colors duration-300"
               target="_blank"
               title="View"
@@ -70,7 +75,11 @@ const PublishedTemplateCard = ({ data, user }) => {
               <Eye className="w-5 h-5" />
             </Link>
             <Link
-              href={`/templete/editor/?templateId=${templateId}`}
+              href={
+                !isResumeTemplate
+                  ? `/templete/editor/?templateId=${templateId}`
+                  : `/resume-template/editor/?templateId=${templateId}`
+              }
               target="_blank"
               className="p-3 bg-green-600 text-white rounded-full hover:bg-green-500 transition-colors duration-300"
               title="Update"
