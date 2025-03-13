@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTemplateData } from "@/redux/templateSlice";
 import PublishedTemplateCard from "./component/publishedTempleteCard";
 import { useUser } from "@/contexts/UserContext";
-import TemplateCard2 from "./component/templateCard2";
+// import TemplateCard2 from "./component/templateCard2";
 
 // Sample JSON data
 const editableTemplate = {
@@ -59,7 +59,7 @@ const TemplatesPages = () => {
         </div>
         <div className="mt-5 flex gap-5">
           <TemplateCard data={editableTemplate} />
-          <TemplateCard2 data={editableTemplate} />
+          {/* <TemplateCard2 data={editableTemplate} /> */}
         </div>
       </div>
 
