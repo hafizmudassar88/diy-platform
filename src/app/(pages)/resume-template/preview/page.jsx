@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import axiosInstance from "@/lib/axios";
 import { Nav } from "./components/nav";
@@ -79,7 +79,8 @@ const sampleData = {
   ],
 };
 
-function ResumePreviewPage() {
+// Create a separate component that uses useSearchParams
+function ResumeContent() {
   const [resumeData, setResumeData] = useState(sampleData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -193,6 +194,24 @@ function ResumePreviewPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+// Main component that wraps ResumeContent with Suspense
+function ResumePreviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-lg">Loading resume template...</p>
+          </div>
+        </div>
+      }
+    >
+      <ResumeContent />
+    </Suspense>
   );
 }
 

@@ -77,7 +77,7 @@ const ResumePDF = ({ data }) => {
             <Text style={styles.text}>
               {data.email} | {data.phone}
             </Text>
-            <Text style={styles.text}>{data.location}</Text>
+            <Text style={styles.text}>{data?.location}</Text>
           </View>
         </View>
 
@@ -112,7 +112,7 @@ const ResumePDF = ({ data }) => {
                 {exp.company} - {exp.title}
               </Text>
               <Text style={styles.text}>
-                {exp.location} | {exp.start} - {exp.end}
+                {exp?.location} | {exp.start} - {exp.end}
               </Text>
               {exp.description.map((desc, j) => (
                 <Text key={j} style={styles.listItem}>
@@ -155,7 +155,10 @@ const ResumePDF = ({ data }) => {
   );
 };
 
-export function DownloadResumeButton({ data }) {
+export default function DownloadResumeButton({ data }) {
+  if (typeof window === "undefined") {
+    return null;
+  }
   return (
     <PDFDownloadLink
       document={<ResumePDF data={data} />}

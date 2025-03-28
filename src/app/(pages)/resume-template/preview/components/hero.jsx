@@ -2,7 +2,13 @@
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { DownloadResumeButton } from "@/components/resume-pdf";
+import dynamic from "next/dynamic";
+// import { DownloadResumeButton } from "@/components/resume-pdf";
+
+const ResumePdfViewer = dynamic(() => import("@/components/resume-pdf"), {
+  ssr: false, // Critical setting - prevents server-side rendering
+  loading: () => <p>Loading PDF viewer...</p>,
+});
 
 export function Hero({ data }) {
   const getInitials = (name) => {
@@ -23,7 +29,7 @@ export function Hero({ data }) {
             <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl lg:leading-[1.1]">
               {data.name || "Your Name"}
             </h1>
-            <DownloadResumeButton data={data} />
+            {typeof window !== "undefined" && <ResumePdfViewer data={data} />}
           </div>
           {data.title && (
             <h2 className="text-xl text-muted-foreground mt-2">{data.title}</h2>
