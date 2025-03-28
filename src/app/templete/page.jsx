@@ -6,14 +6,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTemplateData } from "@/redux/templateSlice";
 import PublishedTemplateCard from "./component/publishedTempleteCard";
 import { useUser } from "@/contexts/UserContext";
-// import TemplateCard2 from "./component/templateCard2";
+import TemplateCard2 from "./component/templateCard2";
 
 // Sample JSON data
-const editableTemplate = {
+const webAppTemplate = {
   logoImage:
     "https://png.pngtree.com/png-clipart/20190521/ourmid/pngtree-knowledge-network-trees-elements-of-studentseducational-thinking-back-to-school-png-image_1042961.jpg",
-  name: "Template Title",
-  description: "This is a template description",
+  name: "Web App",
+  description: "This is Web App",
+};
+
+const resumeTemplate = {
+  logoImage:
+    "/images/resume.jpg",
+  name: "Resume",
+  description: "This is a resume template",
 };
 
 const TemplatesPages = () => {
@@ -58,8 +65,12 @@ const TemplatesPages = () => {
           Pick the one you love and customize it for your new website
         </div>
         <div className="mt-5 flex gap-5">
-          <TemplateCard data={editableTemplate} />
-          {/* <TemplateCard2 data={editableTemplate} /> */}
+          <div className="mt-5 flex gap-5">
+            <div className="mt-5 flex gap-5">
+              <TemplateCard data={webAppTemplate} />
+              <TemplateCard2 data={resumeTemplate} />
+            </div>
+          </div>
         </div>
       </div>
 

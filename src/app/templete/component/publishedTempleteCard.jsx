@@ -16,9 +16,13 @@ import {
 import { Button } from "@/components/ui/button"; // shadcn/ui Button component
 
 const PublishedTemplateCard = ({ data, user }) => {
-  const template = data?.details?.home;
-  const templateId = data?._id;
+  // const template = data?.details?.home;
   const isResumeTemplate = Boolean(data?.details?.resume);
+  const resume = data?.details?.resume;
+  const home = data?.details?.home;
+
+  const templateId = data?._id;
+  // const isResumeTemplate = Boolean(data?.details?.resume);
   const dispatch = useDispatch();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -50,16 +54,24 @@ const PublishedTemplateCard = ({ data, user }) => {
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-center transition-opacity duration-300 group-hover:opacity-60 bg-contain bg-no-repeat"
-          style={{ backgroundImage: `url(${template?.logoImage})` }}
+          style={{
+            backgroundImage: `url(${
+              isResumeTemplate ? resume?.profileImage : home?.logoImage
+            })`,
+          }}
         />
 
         {/* Overlay with buttons */}
         <div className="absolute inset-0 flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50">
           <h2 className="text-white font-bold text-lg mb-2">
-            {template?.name || "No Name"}
+            {isResumeTemplate
+              ? resume?.title || "No Title"
+              : home?.name || "No Name"}
           </h2>
           <p className="text-white text-sm mb-4 text-center">
-            {template?.tagLine || "No Description"}
+            {isResumeTemplate
+              ? resume?.about?.split(" ").slice(0, 12).join(" ") + "..."
+              : home?.tagLine || home?.description || "No Description"}
           </p>
           <div className="flex gap-4">
             <Link
