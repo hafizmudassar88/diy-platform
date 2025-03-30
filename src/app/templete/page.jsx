@@ -17,8 +17,7 @@ const webAppTemplate = {
 };
 
 const resumeTemplate = {
-  logoImage:
-    "/images/resume.jpg",
+  logoImage: "/images/resume.jpg",
   name: "Resume",
   description: "This is a resume template",
 };
@@ -46,9 +45,11 @@ const TemplatesPages = () => {
     if (item.status === "APPROVED") return true; // Show to everyone
     if (
       item.status === "PENDING" &&
-      ["USER", "ADMIN", "SUPER_ADMIN"].includes(user?.role)
-    )
-      return true;
+      (item.createdBy?.$oid === user?.id ||
+        ["ADMIN", "SUPER_ADMIN"].includes(user?.role))
+    ) {
+      return true; // Creator, Admins
+    }
     if (
       item.status === "CANCELLED" &&
       ["ADMIN", "SUPER_ADMIN"].includes(user?.role)
