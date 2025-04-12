@@ -42,19 +42,25 @@ const TemplatesPages = () => {
 
   // Role-based filtering
   const filteredTemplates = data.filter((item) => {
-    if (item.status === "APPROVED") return true; // Show to everyone
+    const creatorId = item.createdBy?._id; // fix: extract from nested object
+    const isOwner = creatorId === user?.id;
+
+    if (item.status === "APPROVED") return true;
+
     if (
       item.status === "PENDING" &&
-      (item.createdBy?.$oid === user?.id ||
-        ["ADMIN", "SUPER_ADMIN"].includes(user?.role))
+      (isOwner || ["ADMIN", "SUPER_ADMIN"].includes(user?.role))
     ) {
-      return true; // Creator, Admins
+      return true;
     }
+
     if (
       item.status === "CANCELLED" &&
       ["ADMIN", "SUPER_ADMIN"].includes(user?.role)
-    )
-      return true; // Only for Admins
+    ) {
+      return true;
+    }
+
     return false;
   });
 
