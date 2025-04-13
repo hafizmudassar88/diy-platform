@@ -47,9 +47,13 @@ const PublishedTemplateCard = ({ data, user }) => {
     <div className="flex justify-center items-center bg-gray-100 rounded-xl ring-2 ring-[#1B94A6] shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <div className="relative w-64 h-80 overflow-hidden rounded-lg shadow-lg group">
         {/* Status Badge (Prominent) */}
-        <div className={`absolute top-2 left-2 ${statusClasses[data?.status]}`}>
-          {data?.status}
-        </div>
+        {!isResumeTemplate && (
+          <div
+            className={`absolute top-2 left-2 ${statusClasses[data?.status]}`}
+          >
+            {data?.status}
+          </div>
+        )}
 
         {/* Background Image */}
         <div
