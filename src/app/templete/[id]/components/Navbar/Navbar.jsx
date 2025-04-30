@@ -41,11 +41,33 @@ const NavbarTemplete = () => {
   }, []);
 
   const navItems = [
-    { name: "Home", url: `/templete/${id}` },
-    { name: "About Us", url: `/templete/${id}/about` },
-    { name: "Contact Us", url: `/templete/${id}/contact` },
-    { name: "Blogs", url: `/templete/${id}/blogs` },
-    { name: "Research", url: `/templete/${id}/research` },
+    { name: "Home", url: `/templete/${id}`, condition: true },
+    {
+      name: "About Us",
+      url: `/templete/${id}/about`,
+      condition: !!templateData?.details?.about?.bio,
+    },
+    {
+      name: "Contact Us",
+      url: `/templete/${id}/contact`,
+      condition:
+        !!templateData?.details?.contact?.email ||
+        !!templateData?.details?.contact?.address,
+    },
+    {
+      name: "Blogs",
+      url: `/templete/${id}/blogs`,
+      condition:
+        (templateData?.blogs?.length || templateData?.details?.blogs?.length) >
+        0,
+    },
+    {
+      name: "Research",
+      url: `/templete/${id}/research`,
+      condition:
+        (templateData?.researches?.length ||
+          templateData?.details?.research?.length) > 0,
+    },
   ];
 
   return (
@@ -56,9 +78,11 @@ const NavbarTemplete = () => {
           <Image src={logoImage} alt="ShwraLogo" width={100} height={100} />
         </div>
         <div className="flex gap-12">
-          {navItems.map((item, index) => (
-            <NavLink key={index} item={item} id={id} />
-          ))}
+          {navItems
+            .filter((item) => item.condition) // Only show items where `condition` is true
+            .map((item, index) => (
+              <NavLink key={index} item={item} id={id} />
+            ))}
         </div>
       </div>
 
@@ -78,9 +102,11 @@ const NavbarTemplete = () => {
       >
         <div className="flex items-center justify-between px-4 py-3">DIY</div>
         <div className="flex flex-col gap-10 px-4 justify-center mt-16 font-semibold">
-          {navItems.map((item, index) => (
-            <NavLink key={index} item={item} id={id} />
-          ))}
+          {navItems
+            .filter((item) => item.condition) // Only show items where `condition` is true
+            .map((item, index) => (
+              <NavLink key={index} item={item} id={id} />
+            ))}
         </div>
       </div>
 

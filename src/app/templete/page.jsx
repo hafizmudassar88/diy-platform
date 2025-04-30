@@ -63,6 +63,7 @@ const TemplatesPages = () => {
 
     return false;
   });
+  console.log("Filtered (Published) Templates:", filteredTemplates);
 
   return (
     <div className="bg-white grid gap-y-20 mt-20 p-5 py-10">
